@@ -911,6 +911,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_modern_pixel_camera"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "11bd8340740dfc8e49351bd5edbe2b0cbfb48faaa98f006057969e9f8e791aa9"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy_pbr"
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1102,6 +1111,7 @@ name = "bevy_saltius_finni"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "bevy_modern_pixel_camera",
  "getrandom 0.3.3",
  "log",
  "rand 0.9.1",

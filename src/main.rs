@@ -5,6 +5,7 @@
 
 mod asset_tracking;
 mod audio;
+mod camera;
 mod demo;
 #[cfg(feature = "dev")]
 mod dev_tools;
@@ -25,6 +26,7 @@ impl Plugin for AppPlugin {
         // Add Bevy plugins.
         app.add_plugins(
             DefaultPlugins
+                .set(ImagePlugin::default_nearest())
                 .set(AssetPlugin {
                     // Wasm builds will check for meta files (that don't exist) if this isn't set.
                     // This causes errors and even panics on web build on itch.
@@ -47,6 +49,7 @@ impl Plugin for AppPlugin {
         app.add_plugins((
             asset_tracking::plugin,
             audio::plugin,
+            camera::plugin,
             demo::plugin,
             #[cfg(feature = "dev")]
             dev_tools::plugin,
@@ -69,9 +72,6 @@ impl Plugin for AppPlugin {
         // Set up the `Pause` state.
         app.init_state::<Pause>();
         app.configure_sets(Update, PausableSystems.run_if(in_state(Pause(false))));
-
-        // Spawn the main camera.
-        app.add_systems(Startup, spawn_camera);
     }
 }
 
@@ -96,7 +96,3 @@ struct Pause(pub bool);
 /// A system set for systems that shouldn't run while the game is paused.
 #[derive(SystemSet, Copy, Clone, Eq, PartialEq, Hash, Debug)]
 struct PausableSystems;
-
-fn spawn_camera(mut commands: Commands) {
-    commands.spawn((Name::new("Camera"), Camera2d));
-}
