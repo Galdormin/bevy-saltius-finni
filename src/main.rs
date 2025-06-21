@@ -16,6 +16,7 @@ mod theme;
 use bevy::{asset::AssetMetaCheck, prelude::*};
 
 use avian2d::PhysicsPlugins;
+use bevy_ecs_ldtk::prelude::*;
 use leafwing_input_manager::prelude::*;
 
 fn main() -> AppExit {
@@ -48,6 +49,7 @@ impl Plugin for AppPlugin {
                 }),
             PhysicsPlugins::default().with_length_unit(8.0),
             InputManagerPlugin::<Action>::default(),
+            LdtkPlugin,
         ));
 
         // Add other plugins.

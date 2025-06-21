@@ -3,6 +3,7 @@
 use bevy::prelude::*;
 
 use avian2d::{math::*, prelude::*};
+use bevy_ecs_ldtk::prelude::*;
 
 use crate::{
     asset_tracking::LoadResource, audio::music, platformer::player::CharacterControllerBundle,
@@ -12,6 +13,11 @@ use crate::{
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<LevelAssets>();
     app.load_resource::<LevelAssets>();
+
+    // LDTK
+    app.insert_resource(LevelSelection::index(0));
+    app.register_ldtk_int_cell::<WallBundle>(1);
+    app.add_systems(Update, spawn_wall.run_if(in_state(Screen::Gameplay)));
 }
 
 #[derive(Resource, Asset, Clone, Reflect)]
@@ -30,9 +36,18 @@ impl FromWorld for LevelAssets {
     }
 }
 
-/// A system that spawns the main level.
+#[derive(Default, Component, Reflect, Debug)]
+#[reflect(Component)]
+struct Wall;
+
+#[derive(Default, Bundle, LdtkIntCell)]
+struct WallBundle {
+    wall: Wall,
+}
+
 pub fn spawn_level(
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
     level_assets: Res<LevelAssets>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
@@ -47,11 +62,11 @@ pub fn spawn_level(
                 Name::new("Gameplay Music"),
                 music(level_assets.music.clone())
             ),
-            platform(Vec2::new(280.0, 10.0), Vec2::new(0.0, -70.0)),
-            platform(Vec2::new(30.0, 2.0), Vec2::new(-115.0, -45.0)),
-            platform(Vec2::new(50.0, 2.0), Vec2::new(-50.0, -30.0)),
-            platform(Vec2::new(30.0, 2.0), Vec2::new(115.0, -45.0)),
-            platform(Vec2::new(50.0, 2.0), Vec2::new(50.0, -30.0)),
+            LdtkWorldBundle {
+                ldtk_handle: asset_server.load("world.ldtk").into(),
+                transform: Transform::from_xyz(-160.0, -90.0, -1.0),
+                ..Default::default()
+            },
             (
                 Mesh2d(meshes.add(Capsule2d::new(4.0, 4.0))),
                 MeshMaterial2d(materials.add(Color::srgb(0.2, 0.7, 0.9))),
@@ -63,15 +78,10 @@ pub fn spawn_level(
     ));
 }
 
-fn platform(size: Vec2, position: Vec2) -> impl Bundle {
-    (
-        Sprite {
-            color: Color::srgb(0.7, 0.7, 0.8),
-            custom_size: Some(size),
-            ..default()
-        },
-        Transform::from_translation(position.extend(0.0)),
-        RigidBody::Static,
-        Collider::rectangle(size.x, size.y),
-    )
+fn spawn_wall(mut commands: Commands, walls: Query<Entity, Added<Wall>>) {
+    for entity in walls {
+        commands
+            .entity(entity)
+            .insert((Collider::rectangle(8.0, 8.0), RigidBody::Static));
+    }
 }

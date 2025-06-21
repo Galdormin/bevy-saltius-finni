@@ -164,7 +164,7 @@ fn update_grounded(
     }
 }
 
-/// Responds to [`MovementAction`] events and moves character controllers accordingly.
+/// Responds to [`Action`] events and moves character controllers accordingly.
 fn movement(
     action_state: Single<&ActionState<Action>, With<CharacterController>>,
     controller: Single<
