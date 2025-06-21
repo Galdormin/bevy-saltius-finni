@@ -5,14 +5,19 @@
 
 mod asset_tracking;
 mod audio;
-mod demo;
+mod camera;
 #[cfg(feature = "dev")]
 mod dev_tools;
 mod menus;
+mod platformer;
 mod screens;
 mod theme;
 
 use bevy::{asset::AssetMetaCheck, prelude::*};
+
+use avian2d::PhysicsPlugins;
+use bevy_ecs_ldtk::prelude::*;
+use leafwing_input_manager::prelude::*;
 
 fn main() -> AppExit {
     App::new().add_plugins(AppPlugin).run()
@@ -23,8 +28,9 @@ pub struct AppPlugin;
 impl Plugin for AppPlugin {
     fn build(&self, app: &mut App) {
         // Add Bevy plugins.
-        app.add_plugins(
+        app.add_plugins((
             DefaultPlugins
+                .set(ImagePlugin::default_nearest())
                 .set(AssetPlugin {
                     // Wasm builds will check for meta files (that don't exist) if this isn't set.
                     // This causes errors and even panics on web build on itch.
@@ -41,16 +47,20 @@ impl Plugin for AppPlugin {
                     .into(),
                     ..default()
                 }),
-        );
+            PhysicsPlugins::default().with_length_unit(8.0),
+            InputManagerPlugin::<Action>::default(),
+            LdtkPlugin,
+        ));
 
         // Add other plugins.
         app.add_plugins((
             asset_tracking::plugin,
             audio::plugin,
-            demo::plugin,
+            camera::plugin,
             #[cfg(feature = "dev")]
             dev_tools::plugin,
             menus::plugin,
+            platformer::plugin,
             screens::plugin,
             theme::plugin,
         ));
@@ -69,9 +79,6 @@ impl Plugin for AppPlugin {
         // Set up the `Pause` state.
         app.init_state::<Pause>();
         app.configure_sets(Update, PausableSystems.run_if(in_state(Pause(false))));
-
-        // Spawn the main camera.
-        app.add_systems(Startup, spawn_camera);
     }
 }
 
@@ -97,6 +104,23 @@ struct Pause(pub bool);
 #[derive(SystemSet, Copy, Clone, Eq, PartialEq, Hash, Debug)]
 struct PausableSystems;
 
-fn spawn_camera(mut commands: Commands) {
-    commands.spawn((Name::new("Camera"), Camera2d));
+// This is the list of "things in the game I want to be able to do based on input"
+#[derive(Actionlike, PartialEq, Eq, Hash, Clone, Copy, Debug, Reflect)]
+enum Action {
+    // Movement
+    Left,
+    Right,
+    Jump,
+}
+
+impl Action {
+    const DIRECTIONS: [Self; 2] = [Action::Left, Action::Right];
+
+    fn direction(self) -> Option<i8> {
+        match self {
+            Action::Left => Some(-1),
+            Action::Right => Some(1),
+            _ => None,
+        }
+    }
 }

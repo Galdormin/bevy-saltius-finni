@@ -52,7 +52,7 @@ pub fn player(
             }),
             ..default()
         },
-        Transform::from_scale(Vec2::splat(8.0).extend(1.0)),
+        Transform::default(),
         MovementController {
             max_speed,
             ..default()

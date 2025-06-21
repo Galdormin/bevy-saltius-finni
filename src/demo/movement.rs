@@ -13,8 +13,9 @@
 //! purposes. If you want to move the player in a smoother way,
 //! consider using a [fixed timestep](https://github.com/bevyengine/bevy/blob/main/examples/movement/physics_in_fixed_timestep.rs).
 
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::prelude::*;
 
+use crate::camera::MainCamera;
 use crate::{AppSystems, PausableSystems};
 
 pub(super) fn plugin(app: &mut App) {
@@ -48,8 +49,8 @@ impl Default for MovementController {
     fn default() -> Self {
         Self {
             intent: Vec2::ZERO,
-            // 400 pixels per second is a nice default, but we can still vary this per character.
-            max_speed: 400.0,
+            // 50 pixels per second is a nice default, but we can still vary this per character.
+            max_speed: 80.0,
         }
     }
 }
@@ -69,10 +70,14 @@ fn apply_movement(
 pub struct ScreenWrap;
 
 fn apply_screen_wrap(
-    window: Single<&Window, With<PrimaryWindow>>,
+    camera: Single<&Projection, With<MainCamera>>,
     mut wrap_query: Query<&mut Transform, With<ScreenWrap>>,
 ) {
-    let size = window.size() + 256.0;
+    let Projection::Orthographic(projection) = *camera else {
+        return;
+    };
+
+    let size = 1.2 * projection.area.size();
     let half_size = size / 2.0;
     for mut transform in &mut wrap_query {
         let position = transform.translation.xy();
