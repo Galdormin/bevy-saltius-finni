@@ -65,6 +65,14 @@ impl Plugin for AppPlugin {
             theme::plugin,
         ));
 
+        // Resources
+        app.insert_resource(LdtkSettings {
+            level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
+                load_level_neighbors: true,
+            },
+            ..Default::default()
+        });
+
         // Order new `AppSystems` variants by adding them here:
         app.configure_sets(
             Update,
