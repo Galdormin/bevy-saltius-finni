@@ -9,7 +9,7 @@ use crate::{
     asset_tracking::LoadResource,
     audio::music,
     camera::{LEVEL_HEIGHT, LEVEL_WIDTH, MainCamera},
-    player::movement::{CharacterController, CharacterControllerBundle},
+    player::movement::{CharacterController, CharacterControllerBundle, JumpAmount},
     screens::Screen,
 };
 
@@ -129,10 +129,12 @@ fn update_level_selection(
 }
 
 fn restart_level(
-    mut player: Single<&mut Transform, With<CharacterController>>,
+    player: Single<(&mut Transform, &mut JumpAmount), With<CharacterController>>,
     input: Res<ButtonInput<KeyCode>>,
 ) {
+    let (mut transform, mut jump_amount) = player.into_inner();
     if input.just_pressed(KeyCode::KeyR) {
-        player.translation = Vec3::new(LEVEL_WIDTH / 2.0, -LEVEL_HEIGHT / 2.0, 0.0);
+        transform.translation = Vec3::new(LEVEL_WIDTH / 2.0, -LEVEL_HEIGHT / 2.0, 0.0);
+        jump_amount.reset();
     }
 }

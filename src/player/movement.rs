@@ -8,9 +8,16 @@ use leafwing_input_manager::prelude::*;
 use crate::{Action, AppSystems, PausableSystems};
 
 pub(super) fn plugin(app: &mut App) {
+    app.add_event::<JumpEvent>();
     app.add_systems(
         Update,
-        (update_grounded, apply_gravity, movement)
+        (
+            update_grounded,
+            apply_gravity,
+            movement,
+            jump,
+            log_jump_amount,
+        )
             .chain()
             .in_set(AppSystems::RecordInput)
             .in_set(PausableSystems),
@@ -25,25 +32,47 @@ pub(super) fn plugin(app: &mut App) {
     );
 }
 
+#[derive(Event, Debug)]
+struct JumpEvent;
+
 /// A marker component indicating that an entity is using a character controller.
-#[derive(Component)]
+#[derive(Component, Reflect, Debug)]
+#[reflect(Component)]
 pub struct CharacterController;
 
 /// A marker component indicating that an entity is on the ground.
-#[derive(Component)]
+#[derive(Component, Reflect, Debug)]
+#[reflect(Component)]
 #[component(storage = "SparseSet")]
 pub struct Grounded;
 
 /// The speed used for character movement.
-#[derive(Component)]
+#[derive(Component, Reflect, Debug)]
+#[reflect(Component)]
 pub struct MovementSpeed(pub Scalar);
 
 /// The strength of a jump.
-#[derive(Component)]
+#[derive(Component, Reflect, Debug)]
+#[reflect(Component)]
 pub struct JumpImpulse(pub Scalar);
 
+/// The amount of jump that can do the player.
+#[derive(Component, Reflect, Debug, Default)]
+#[reflect(Component)]
+pub struct JumpAmount {
+    pub max: u32,
+    pub remaining: u32,
+}
+
+impl JumpAmount {
+    pub fn reset(&mut self) {
+        self.remaining = self.max;
+    }
+}
+
 /// The gravitational acceleration used for a character controller.
-#[derive(Component)]
+#[derive(Component, Reflect, Debug)]
+#[reflect(Component)]
 pub struct GravityController {
     pub jump_gravity: Scalar,
     pub fall_gravity: Scalar,
@@ -65,6 +94,7 @@ impl Default for GravityController {
 pub struct MovementBundle {
     speed: MovementSpeed,
     jump_impulse: JumpImpulse,
+    jump_amount: JumpAmount,
     input_map: InputMap<Action>,
 }
 
@@ -73,6 +103,7 @@ impl MovementBundle {
         Self {
             speed: MovementSpeed(speed),
             jump_impulse: JumpImpulse(jump_impulse),
+            jump_amount: JumpAmount::default(),
             input_map: MovementBundle::default_input_map(),
         }
     }
@@ -169,21 +200,17 @@ fn update_grounded(
 
 /// Responds to [`Action`] events and moves character controllers accordingly.
 fn movement(
+    mut jump_event_writer: EventWriter<JumpEvent>,
     action_state: Single<&ActionState<Action>, With<CharacterController>>,
     controller: Single<
-        (
-            &MovementSpeed,
-            &JumpImpulse,
-            &mut LinearVelocity,
-            Has<Grounded>,
-        ),
+        (&MovementSpeed, &mut LinearVelocity, Has<Grounded>),
         With<CharacterController>,
     >,
 ) {
-    let (movement_speed, jump_impulse, mut linear_velocity, is_grounded) = controller.into_inner();
+    let (movement_speed, mut linear_velocity, is_grounded) = controller.into_inner();
 
     if is_grounded && action_state.just_pressed(&Action::Jump) {
-        linear_velocity.y = jump_impulse.0;
+        jump_event_writer.write(JumpEvent);
     }
 
     let mut direction = 0;
@@ -196,6 +223,21 @@ fn movement(
     }
 
     linear_velocity.x = (direction as Scalar) * movement_speed.0;
+}
+
+/// Handle Jump Behavior
+fn jump(
+    mut jump_event_reader: EventReader<JumpEvent>,
+    player: Single<(&mut JumpAmount, &JumpImpulse, &mut LinearVelocity), With<CharacterController>>,
+) {
+    let (mut jump_amount, jump_impulse, mut linear_velocity) = player.into_inner();
+    for _ in jump_event_reader.read() {
+        linear_velocity.0.y = jump_impulse.0;
+
+        if jump_amount.remaining > 0 {
+            jump_amount.remaining -= 1;
+        }
+    }
 }
 
 /// Applies [`ControllerGravity`] to character controllers.
@@ -376,5 +418,12 @@ fn kinematic_controller_collisions(
                 }
             }
         }
+    }
+}
+
+/// Log JumpAmount
+fn log_jump_amount(jumps: Query<&JumpAmount, Changed<JumpAmount>>) {
+    for jump in jumps {
+        info!("JumpAmount {}/{}", jump.remaining, jump.max);
     }
 }

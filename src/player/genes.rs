@@ -2,7 +2,9 @@
 
 use bevy::{math::FloatPow, prelude::*};
 
-use crate::player::movement::{CharacterController, GravityController, JumpImpulse, MovementSpeed};
+use crate::player::movement::{
+    CharacterController, GravityController, JumpAmount, JumpImpulse, MovementSpeed,
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(Update, player_genes_changed);
@@ -103,7 +105,12 @@ impl PlayerGenes {
 fn player_genes_changed(
     player_genes: Res<PlayerGenes>,
     player: Single<
-        (&mut MovementSpeed, &mut JumpImpulse, &mut GravityController),
+        (
+            &mut JumpAmount,
+            &mut JumpImpulse,
+            &mut MovementSpeed,
+            &mut GravityController,
+        ),
         With<CharacterController>,
     >,
 ) {
@@ -111,8 +118,10 @@ fn player_genes_changed(
         return;
     }
 
-    let (mut movement_speed, mut jump_impulse, mut controller_gravity) = player.into_inner();
+    let (mut jump_amount, mut jump_impulse, mut movement_speed, mut controller_gravity) =
+        player.into_inner();
 
+    jump_amount.max = player_genes.total_jump_amount().max(0) as u32;
     movement_speed.0 = player_genes.total_movement_speed() * 8.0;
 
     // Compute the jump gravity and the jump impulse from jump time and jump height
