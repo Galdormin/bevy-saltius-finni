@@ -2,14 +2,14 @@
 
 use bevy::prelude::*;
 
-use avian2d::{math::*, prelude::*};
+use avian2d::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
 use crate::{
     asset_tracking::LoadResource,
     audio::music,
     camera::{LEVEL_HEIGHT, LEVEL_WIDTH, MainCamera},
-    platformer::player::{CharacterController, CharacterControllerBundle},
+    player::movement::{CharacterController, CharacterControllerBundle},
     screens::Screen,
 };
 
@@ -79,8 +79,9 @@ pub fn spawn_level(
                 Mesh2d(meshes.add(Capsule2d::new(4.0, 4.0))),
                 MeshMaterial2d(materials.add(Color::srgb(0.2, 0.7, 0.9))),
                 Transform::from_xyz(LEVEL_WIDTH / 2.0, -LEVEL_HEIGHT / 2.0, 0.0),
-                CharacterControllerBundle::new(Collider::capsule(4.0, 4.0), Vector::NEG_Y * 300.0)
-                    .with_movement(60.0, 120.0, (30.0 as Scalar).to_radians()),
+                CharacterControllerBundle::new(Collider::capsule(4.0, 4.0))
+                    .with_movement(60.0, 120.0)
+                    .with_gravity(250.0, 350.0, 450.0),
             )
         ],
     ));

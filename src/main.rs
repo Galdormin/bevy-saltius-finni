@@ -10,6 +10,7 @@ mod camera;
 mod dev_tools;
 mod menus;
 mod platformer;
+mod player;
 mod screens;
 mod theme;
 
@@ -60,6 +61,7 @@ impl Plugin for AppPlugin {
             #[cfg(feature = "dev")]
             dev_tools::plugin,
             menus::plugin,
+            player::plugin,
             platformer::plugin,
             screens::plugin,
             theme::plugin,

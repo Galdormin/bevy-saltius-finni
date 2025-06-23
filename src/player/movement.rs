@@ -1,4 +1,4 @@
-//! PLayer behavior
+//! Code for the player movement (Jump, Gravity, Collision, etc.)
 
 use bevy::prelude::*;
 
@@ -36,21 +36,21 @@ pub struct Grounded;
 
 /// The speed used for character movement.
 #[derive(Component)]
-pub struct MovementSpeed(Scalar);
+pub struct MovementSpeed(pub Scalar);
 
 /// The strength of a jump.
 #[derive(Component)]
-pub struct JumpImpulse(Scalar);
+pub struct JumpImpulse(pub Scalar);
 
 /// The gravitational acceleration used for a character controller.
 #[derive(Component)]
-pub struct ControllerGravity {
-    jump_gravity: Scalar,
-    fall_gravity: Scalar,
-    terminal_velocity: Scalar,
+pub struct GravityController {
+    pub jump_gravity: Scalar,
+    pub fall_gravity: Scalar,
+    pub terminal_velocity: Scalar,
 }
 
-impl Default for ControllerGravity {
+impl Default for GravityController {
     fn default() -> Self {
         Self {
             jump_gravity: 300.0,
@@ -60,18 +60,11 @@ impl Default for ControllerGravity {
     }
 }
 
-/// The maximum angle a slope can have for a character controller
-/// to be able to climb and jump. If the slope is steeper than this angle,
-/// the character will slide down.
-#[derive(Component)]
-pub struct MaxSlopeAngle(Scalar);
-
 /// A bundle that contains components for character movement.
 #[derive(Bundle)]
 pub struct MovementBundle {
     speed: MovementSpeed,
     jump_impulse: JumpImpulse,
-    max_slope_angle: MaxSlopeAngle,
     input_map: InputMap<Action>,
 }
 
@@ -80,7 +73,6 @@ impl MovementBundle {
         Self {
             speed: MovementSpeed(speed),
             jump_impulse: JumpImpulse(jump_impulse),
-            max_slope_angle: MaxSlopeAngle(30.0_f32.to_radians()),
             input_map: MovementBundle::default_input_map(),
         }
     }
@@ -119,7 +111,7 @@ pub struct CharacterControllerBundle {
     body: RigidBody,
     collider: Collider,
     ground_caster: ShapeCaster,
-    gravity: ControllerGravity,
+    gravity: GravityController,
     movement: MovementBundle,
 }
 
@@ -135,7 +127,7 @@ impl CharacterControllerBundle {
             collider,
             ground_caster: ShapeCaster::new(caster_shape, Vector::ZERO, 0.0, Dir2::NEG_Y)
                 .with_max_distance(1.0),
-            gravity: ControllerGravity::default(),
+            gravity: GravityController::default(),
             movement: MovementBundle::default(),
         }
     }
@@ -151,7 +143,7 @@ impl CharacterControllerBundle {
         fall_gravity: Scalar,
         terminal_velocity: Scalar,
     ) -> Self {
-        self.gravity = ControllerGravity {
+        self.gravity = GravityController {
             jump_gravity,
             fall_gravity,
             terminal_velocity,
@@ -163,23 +155,11 @@ impl CharacterControllerBundle {
 /// Updates the [`Grounded`] status for character controllers.
 fn update_grounded(
     mut commands: Commands,
-    mut query: Query<
-        (Entity, &ShapeHits, &Rotation, Option<&MaxSlopeAngle>),
-        With<CharacterController>,
-    >,
+    mut query: Query<(Entity, &ShapeHits), With<CharacterController>>,
 ) {
-    for (entity, hits, rotation, max_slope_angle) in &mut query {
-        // The character is grounded if the shape caster has a hit with a normal
-        // that isn't too steep.
-        let is_grounded = hits.iter().any(|hit| {
-            if let Some(angle) = max_slope_angle {
-                (rotation * -hit.normal2).angle_to(Vector::Y).abs() <= angle.0
-            } else {
-                true
-            }
-        });
-
-        if is_grounded {
+    for (entity, hits) in &mut query {
+        // The character is grounded if the shape caster has a hit
+        if hits.len() >= 1 {
             commands.entity(entity).insert(Grounded);
         } else {
             commands.entity(entity).remove::<Grounded>();
@@ -221,7 +201,7 @@ fn movement(
 /// Applies [`ControllerGravity`] to character controllers.
 fn apply_gravity(
     time: Res<Time>,
-    mut controllers: Query<(&ControllerGravity, &mut LinearVelocity)>,
+    mut controllers: Query<(&GravityController, &mut LinearVelocity)>,
 ) {
     // Precision is adjusted so that the example works with
     // both the `f32` and `f64` features. Otherwise you don't need this.
@@ -255,7 +235,7 @@ fn kinematic_controller_collisions(
     bodies: Query<&RigidBody>,
     collider_rbs: Query<&ColliderOf, Without<Sensor>>,
     mut character_controllers: Query<
-        (&mut Position, &mut LinearVelocity, Option<&MaxSlopeAngle>),
+        (&mut Position, &mut LinearVelocity),
         (With<RigidBody>, With<CharacterController>),
     >,
     time: Res<Time>,
@@ -276,7 +256,7 @@ fn kinematic_controller_collisions(
         let character_rb: RigidBody;
         let is_other_dynamic: bool;
 
-        let (mut position, mut linear_velocity, max_slope_angle) =
+        let (mut position, mut linear_velocity) =
             if let Ok(character) = character_controllers.get_mut(rb1) {
                 is_first = true;
                 character_rb = *bodies.get(rb1).unwrap();
@@ -322,7 +302,7 @@ fn kinematic_controller_collisions(
 
             // Determine if the slope is climbable or if it's too steep to walk on.
             let slope_angle = normal.angle_to(Vector::Y);
-            let climbable = max_slope_angle.is_some_and(|angle| slope_angle.abs() <= angle.0);
+            let climbable = slope_angle <= PI / 12.0;
 
             if deepest_penetration > 0.0 {
                 // If the slope is climbable, snap the velocity so that the character
