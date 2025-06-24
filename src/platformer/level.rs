@@ -9,11 +9,13 @@ use crate::{
     asset_tracking::LoadResource,
     audio::music,
     camera::{LEVEL_HEIGHT, LEVEL_WIDTH, MainCamera},
+    platformer::hud::JumpCounter,
     player::{
         movement::{Dead, JumpAmount, MovementBundle},
         physics::{CharacterController, CharacterControllerBundle},
     },
     screens::Screen,
+    theme::palette::HEADER_TEXT,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -87,6 +89,18 @@ pub fn spawn_level(
                 MovementBundle::default(),
             )
         ],
+    ));
+    commands.spawn((
+        Name::new("HUD"),
+        GlobalZIndex(1),
+        StateScoped(Screen::Gameplay),
+        Node::default(),
+        children![(
+            Text("0".into()),
+            JumpCounter,
+            TextFont::from_font_size(40.0),
+            TextColor(HEADER_TEXT)
+        )],
     ));
 }
 

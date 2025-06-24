@@ -1,6 +1,5 @@
 //! Code for the player movement (Jump, Gravity, Collision, etc.)
 
-use bevy::math::VectorSpace;
 use bevy::prelude::*;
 
 use avian2d::{math::*, prelude::*};

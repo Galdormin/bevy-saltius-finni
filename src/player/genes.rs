@@ -12,7 +12,7 @@ pub(super) fn plugin(app: &mut App) {
     app.insert_resource(PlayerGenes(vec![Gene {
         name: "Rabbit heritage".into(),
         stats: vec![
-            GeneStat::JumpAmount(2),
+            GeneStat::JumpAmount(5),
             GeneStat::JumpHeight(5.0),
             GeneStat::MovementSpeed(8.0),
         ],
