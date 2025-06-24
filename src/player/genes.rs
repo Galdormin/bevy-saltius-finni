@@ -121,6 +121,8 @@ fn player_genes_changed(
         player.into_inner();
 
     jump_amount.max = player_genes.total_jump_amount().max(0) as u32;
+    jump_amount.reset();
+
     movement_speed.0 = player_genes.total_movement_speed() * 8.0;
 
     // Compute the jump gravity and the jump impulse from jump time and jump height

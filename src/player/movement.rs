@@ -1,5 +1,6 @@
 //! Code for the player movement (Jump, Gravity, Collision, etc.)
 
+use bevy::math::VectorSpace;
 use bevy::prelude::*;
 
 use avian2d::{math::*, prelude::*};
@@ -13,7 +14,13 @@ pub(super) fn plugin(app: &mut App) {
     app.add_event::<JumpEvent>();
     app.add_systems(
         Update,
-        (update_coyote_timer, movement, jump, log_jump_amount)
+        (
+            update_dead,
+            update_coyote_timer,
+            movement,
+            jump,
+            log_jump_amount,
+        )
             .chain()
             .in_set(AppSystems::RecordInput)
             .in_set(PausableSystems),
@@ -64,6 +71,12 @@ impl JumpAmount {
         self.remaining = self.max;
     }
 }
+
+/// A marker component indicating that the player is dead.
+#[derive(Component, Reflect, Debug)]
+#[reflect(Component)]
+#[component(storage = "SparseSet")]
+pub struct Dead;
 
 /// A bundle that contains components for character movement.
 #[derive(Bundle)]
@@ -122,11 +135,18 @@ fn movement(
             &mut LinearVelocity,
             &CoyoteTimer,
             Has<Grounded>,
+            Has<Dead>,
         ),
         With<CharacterController>,
     >,
 ) {
-    let (movement_speed, mut linear_velocity, coyote_timer, is_grounded) = controller.into_inner();
+    let (movement_speed, mut linear_velocity, coyote_timer, is_grounded, is_dead) =
+        controller.into_inner();
+
+    if is_dead {
+        *linear_velocity = LinearVelocity::ZERO;
+        return;
+    }
 
     if action_state.just_pressed(&Action::Jump) && (is_grounded || coyote_timer.can_jump()) {
         jump_event_writer.write(JumpEvent);
@@ -142,6 +162,17 @@ fn movement(
     }
 
     linear_velocity.x = (direction as Scalar) * movement_speed.0;
+}
+
+fn update_dead(
+    mut commands: Commands,
+    players: Query<(Entity, &JumpAmount), (Added<Grounded>, With<CharacterController>)>,
+) {
+    for (entity, jump_amount) in players {
+        if jump_amount.remaining == 0 {
+            commands.entity(entity).insert(Dead);
+        }
+    }
 }
 
 /// Update the coyote timer every frame
