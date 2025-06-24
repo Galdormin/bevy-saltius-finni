@@ -2,9 +2,8 @@
 
 use bevy::{math::FloatPow, prelude::*};
 
-use crate::player::movement::{
-    CharacterController, GravityController, JumpAmount, JumpImpulse, MovementSpeed,
-};
+use crate::player::movement::{JumpAmount, JumpImpulse, MovementSpeed};
+use crate::player::physics::{CharacterController, GravityController};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(Update, player_genes_changed);

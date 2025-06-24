@@ -9,7 +9,8 @@ use crate::{
     asset_tracking::LoadResource,
     audio::music,
     camera::{LEVEL_HEIGHT, LEVEL_WIDTH, MainCamera},
-    player::movement::{CharacterController, CharacterControllerBundle, JumpAmount},
+    player::movement::{JumpAmount, MovementBundle},
+    player::physics::{CharacterController, CharacterControllerBundle},
     screens::Screen,
 };
 
@@ -80,8 +81,8 @@ pub fn spawn_level(
                 MeshMaterial2d(materials.add(Color::srgb(0.2, 0.7, 0.9))),
                 Transform::from_xyz(LEVEL_WIDTH / 2.0, -LEVEL_HEIGHT / 2.0, 0.0),
                 CharacterControllerBundle::new(Collider::capsule(4.0, 4.0))
-                    .with_movement(60.0, 120.0)
                     .with_gravity(250.0, 350.0, 450.0),
+                MovementBundle::default(),
             )
         ],
     ));

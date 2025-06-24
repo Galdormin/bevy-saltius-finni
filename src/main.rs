@@ -8,6 +8,7 @@ mod audio;
 mod camera;
 #[cfg(feature = "dev")]
 mod dev_tools;
+mod event;
 mod menus;
 mod platformer;
 mod player;
@@ -60,6 +61,7 @@ impl Plugin for AppPlugin {
             camera::plugin,
             #[cfg(feature = "dev")]
             dev_tools::plugin,
+            event::plugin,
             menus::plugin,
             player::plugin,
             platformer::plugin,
