@@ -107,7 +107,7 @@ fn update_grounded(
 /// Applies he gravity to character controllers.
 fn apply_gravity(
     time: Res<Time>,
-    mut controllers: Query<(&GravityController, &mut LinearVelocity)>,
+    mut controllers: Query<(&GravityController, &mut LinearVelocity), Without<Grounded>>,
 ) {
     let delta_time = time.delta_secs();
     for (gravity, mut linear_velocity) in &mut controllers {

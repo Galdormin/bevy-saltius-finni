@@ -69,3 +69,24 @@ fn load_resource_assets(world: &mut World) {
         });
     });
 }
+
+pub fn load_texture_atlas(
+    world: &mut World,
+    width: u32,
+    height: u32,
+    columns: u32,
+    rows: u32,
+) -> Handle<TextureAtlasLayout> {
+    let mut texture_atlases = world.resource_mut::<Assets<TextureAtlasLayout>>();
+    let layout = TextureAtlasLayout::from_grid(
+        UVec2 {
+            x: width,
+            y: height,
+        },
+        columns,
+        rows,
+        None,
+        None,
+    );
+    texture_atlases.add(layout)
+}

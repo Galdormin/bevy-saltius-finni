@@ -5,7 +5,7 @@ use bevy::prelude::*;
 use avian2d::{math::*, prelude::*};
 use leafwing_input_manager::prelude::*;
 
-use crate::event::JumpEvent;
+use crate::event::{DeathEvent, JumpEvent};
 use crate::player::physics::{CharacterController, Grounded};
 use crate::{Action, AppSystems, PausableSystems};
 
@@ -13,20 +13,19 @@ pub(super) fn plugin(app: &mut App) {
     app.add_event::<JumpEvent>();
     app.add_systems(
         Update,
-        (
-            update_dead,
-            update_coyote_timer,
-            movement,
-            jump,
-            log_jump_amount,
-        )
+        (update_dead, update_coyote_timer, movement, jump)
             .chain()
             .in_set(AppSystems::RecordInput)
             .in_set(PausableSystems),
     );
 }
 
-/// The speed used for character movement.
+/// The position of the Respawn
+#[derive(Component, Reflect, Debug)]
+#[reflect(Component)]
+pub struct RespawnPosition(pub Vector);
+
+/// The speed used for character movement.Oh
 #[derive(Component, Reflect, Debug)]
 #[reflect(Component)]
 pub struct MovementSpeed(pub Scalar);
@@ -143,7 +142,7 @@ fn movement(
         controller.into_inner();
 
     if is_dead {
-        *linear_velocity = LinearVelocity::ZERO;
+        linear_velocity.x = 0.0;
         return;
     }
 
@@ -163,14 +162,16 @@ fn movement(
     linear_velocity.x = (direction as Scalar) * movement_speed.0;
 }
 
+/// Detect the last jump of the player and trigger "Dead" behavior
 fn update_dead(
     mut commands: Commands,
-    players: Query<(Entity, &JumpAmount), (Added<Grounded>, With<CharacterController>)>,
+    mut death_event: EventWriter<DeathEvent>,
+    player: Single<(Entity, &JumpAmount), (Added<Grounded>, With<CharacterController>)>,
 ) {
-    for (entity, jump_amount) in players {
-        if jump_amount.remaining == 0 {
-            commands.entity(entity).insert(Dead);
-        }
+    let (entity, jump_amount) = player.into_inner();
+    if jump_amount.remaining == 0 {
+        commands.entity(entity).insert(Dead);
+        death_event.write(DeathEvent);
     }
 }
 
@@ -197,12 +198,5 @@ fn jump(
         if jump_amount.remaining > 0 {
             jump_amount.remaining -= 1;
         }
-    }
-}
-
-/// Log JumpAmount
-fn log_jump_amount(jumps: Query<&JumpAmount, Changed<JumpAmount>>) {
-    for jump in jumps {
-        info!("JumpAmount {}/{}", jump.remaining, jump.max);
     }
 }

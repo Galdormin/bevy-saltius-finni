@@ -14,6 +14,7 @@ mod platformer;
 mod player;
 mod screens;
 mod theme;
+mod utils;
 
 use bevy::{asset::AssetMetaCheck, prelude::*};
 
@@ -67,6 +68,7 @@ impl Plugin for AppPlugin {
             platformer::plugin,
             screens::plugin,
             theme::plugin,
+            utils::plugin,
         ));
 
         // Resources

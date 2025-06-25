@@ -1,6 +1,6 @@
 //! Spawn the demo level for the platformer
 
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::Anchor};
 
 use avian2d::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
@@ -9,13 +9,16 @@ use crate::{
     asset_tracking::LoadResource,
     audio::music,
     camera::{LEVEL_HEIGHT, LEVEL_WIDTH, MainCamera},
+    event::{DeathEvent, RespawnEvent},
     platformer::hud::JumpCounter,
     player::{
-        movement::{Dead, JumpAmount, MovementBundle},
+        animation::{PlayerAnimationState, PlayerAssets},
+        movement::{Dead, JumpAmount, MovementBundle, RespawnPosition},
         physics::{CharacterController, CharacterControllerBundle},
     },
     screens::Screen,
     theme::palette::HEADER_TEXT,
+    utils::animation::SpriteAnimation,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -27,7 +30,14 @@ pub(super) fn plugin(app: &mut App) {
     app.register_ldtk_int_cell::<WallBundle>(1);
     app.add_systems(
         Update,
-        (spawn_wall, update_level_selection, restart_level).run_if(in_state(Screen::Gameplay)),
+        (
+            spawn_wall,
+            update_level_selection,
+            save_respawn,
+            restart_level,
+            respawn_player,
+        )
+            .run_if(in_state(Screen::Gameplay)),
     );
 }
 
@@ -62,8 +72,7 @@ struct WallBundle {
 pub fn spawn_level(
     mut commands: Commands,
     level_assets: Res<LevelAssets>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    player_assets: Res<PlayerAssets>,
 ) {
     commands.spawn((
         Name::new("Level"),
@@ -81,12 +90,19 @@ pub fn spawn_level(
                 ..Default::default()
             },
             (
-                Mesh2d(meshes.add(Capsule2d::new(4.0, 4.0))),
-                MeshMaterial2d(materials.add(Color::srgb(0.2, 0.7, 0.9))),
+                Sprite {
+                    image: player_assets.image.clone(),
+                    texture_atlas: Some(TextureAtlas::from(player_assets.atlas.clone())),
+                    anchor: Anchor::Custom(Vec2::new(0.0, -0.2)),
+                    ..default()
+                },
+                SpriteAnimation::from_state(PlayerAnimationState::Idle),
+                PlayerAnimationState::Idle,
                 Transform::from_xyz(LEVEL_WIDTH / 2.0, -LEVEL_HEIGHT / 2.0, 0.0),
-                CharacterControllerBundle::new(Collider::capsule(4.0, 4.0))
+                CharacterControllerBundle::new(Collider::capsule(4.0, 2.0))
                     .with_gravity(250.0, 350.0, 450.0),
                 MovementBundle::default(),
+                RespawnPosition(Vec2::new(LEVEL_WIDTH / 2.0, -LEVEL_HEIGHT / 2.0)),
             )
         ],
     ));
@@ -145,16 +161,38 @@ fn update_level_selection(
     }
 }
 
-fn restart_level(
-    mut commands: Commands,
-    player: Single<(Entity, &mut Transform, &mut JumpAmount), With<CharacterController>>,
+fn restart_level(mut death_event: EventWriter<DeathEvent>, input: Res<ButtonInput<KeyCode>>) {
+    if input.just_pressed(KeyCode::KeyR) {
+        death_event.write(DeathEvent);
+    }
+}
+
+fn save_respawn(
+    player: Single<(&Transform, &mut RespawnPosition), With<CharacterController>>,
     input: Res<ButtonInput<KeyCode>>,
 ) {
-    let (entity, mut transform, mut jump_amount) = player.into_inner();
-    if input.just_pressed(KeyCode::KeyR) {
-        transform.translation = Vec3::new(LEVEL_WIDTH / 2.0, -LEVEL_HEIGHT / 2.0, 0.0);
-
-        jump_amount.reset();
-        commands.entity(entity).remove::<Dead>();
+    if input.just_pressed(KeyCode::KeyT) {
+        let (transform, mut respawn_position) = player.into_inner();
+        *respawn_position = RespawnPosition(transform.translation.truncate());
     }
+}
+
+fn respawn_player(
+    mut commands: Commands,
+    respawn_event: EventReader<RespawnEvent>,
+    player: Single<
+        (Entity, &mut Transform, &mut JumpAmount, &RespawnPosition),
+        With<CharacterController>,
+    >,
+) {
+    if respawn_event.is_empty() {
+        return;
+    }
+
+    let (entity, mut transform, mut jump_amount, respawn_position) = player.into_inner();
+
+    transform.translation = respawn_position.0.extend(0.0);
+
+    jump_amount.reset();
+    commands.entity(entity).remove::<Dead>();
 }
