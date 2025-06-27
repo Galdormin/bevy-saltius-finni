@@ -6,13 +6,13 @@ use avian2d::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
 use crate::{
-    asset_tracking::LoadResource,
+    assets::collections::{LevelAssets, PlayerAssets},
     audio::music,
     camera::{LEVEL_HEIGHT, LEVEL_WIDTH, MainCamera},
     event::{DeathEvent, RespawnEvent},
     platformer::hud::JumpCounter,
     player::{
-        animation::{PlayerAnimationState, PlayerAssets},
+        animation::PlayerAnimationState,
         movement::{Dead, JumpAmount, MovementBundle, RespawnPosition},
         physics::{CharacterController, CharacterControllerBundle},
     },
@@ -22,9 +22,6 @@ use crate::{
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.register_type::<LevelAssets>();
-    app.load_resource::<LevelAssets>();
-
     // LDTK
     app.insert_resource(LevelSelection::Uid(0));
     app.register_ldtk_int_cell::<WallBundle>(1);
@@ -39,25 +36,6 @@ pub(super) fn plugin(app: &mut App) {
         )
             .run_if(in_state(Screen::Gameplay)),
     );
-}
-
-#[derive(Resource, Asset, Clone, Reflect)]
-#[reflect(Resource)]
-pub struct LevelAssets {
-    #[dependency]
-    world: Handle<LdtkProject>,
-    #[dependency]
-    music: Handle<AudioSource>,
-}
-
-impl FromWorld for LevelAssets {
-    fn from_world(world: &mut World) -> Self {
-        let assets = world.resource::<AssetServer>();
-        Self {
-            world: assets.load("world.ldtk"),
-            music: assets.load("audio/music/Going Up.ogg"),
-        }
-    }
 }
 
 #[derive(Default, Component, Reflect, Debug)]
@@ -91,7 +69,7 @@ pub fn spawn_level(
             },
             (
                 Sprite {
-                    image: player_assets.image.clone(),
+                    image: player_assets.sprite.clone(),
                     texture_atlas: Some(TextureAtlas::from(player_assets.atlas.clone())),
                     anchor: Anchor::Custom(Vec2::new(0.0, -0.2)),
                     ..default()

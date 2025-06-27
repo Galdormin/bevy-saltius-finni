@@ -24,7 +24,7 @@ pub(super) fn plugin(app: &mut App) {
 pub enum Screen {
     #[default]
     Splash,
-    Title,
     Loading,
+    Title,
     Gameplay,
 }

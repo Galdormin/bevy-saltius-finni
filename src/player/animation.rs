@@ -6,7 +6,7 @@ use avian2d::prelude::LinearVelocity;
 use bevy::prelude::*;
 
 use crate::{
-    asset_tracking::{LoadResource, load_texture_atlas},
+    assets::collections::PlayerAssets,
     player::{
         movement::Dead,
         physics::{CharacterController, Grounded},
@@ -15,9 +15,6 @@ use crate::{
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.register_type::<PlayerAssets>();
-    app.load_resource::<PlayerAssets>();
-
     app.add_systems(
         Update,
         (
@@ -27,28 +24,6 @@ pub(super) fn plugin(app: &mut App) {
         )
             .run_if(resource_exists::<PlayerAssets>),
     );
-}
-
-/// Resource with the asset of the player character
-#[derive(Resource, Asset, Clone, Reflect)]
-#[reflect(Resource)]
-pub struct PlayerAssets {
-    #[dependency]
-    pub image: Handle<Image>,
-    pub atlas: Handle<TextureAtlasLayout>,
-}
-
-impl FromWorld for PlayerAssets {
-    fn from_world(world: &mut World) -> Self {
-        let atlas = load_texture_atlas(world, 16, 16, 6, 5);
-
-        let assets = world.resource::<AssetServer>();
-
-        Self {
-            image: assets.load("sprites/character_simple.png"),
-            atlas,
-        }
-    }
 }
 
 /// The different state of the animation for the player
@@ -117,12 +92,10 @@ fn update_animation_movement(
             } else {
                 PlayerAnimationState::Walk
             }
+        } else if linear_velocity.y > 0.0 {
+            PlayerAnimationState::Jump
         } else {
-            if linear_velocity.y > 0.0 {
-                PlayerAnimationState::Jump
-            } else {
-                PlayerAnimationState::Fall
-            }
+            PlayerAnimationState::Fall
         };
 
         if new_state != *animation_state {
