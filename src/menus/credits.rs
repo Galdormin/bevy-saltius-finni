@@ -35,20 +35,15 @@ fn spawn_credits_menu(mut commands: Commands) {
 
 fn created_by() -> impl Bundle {
     grid(vec![
-        ["Joe Shmoe", "Implemented alligator wrestling AI"],
-        ["Jane Doe", "Made the music for the alien invasion"],
+        ["Galdormin", "Game Designer & Programmer"],
+        ["Nexia", "Artist"],
     ])
 }
 
 fn assets() -> impl Bundle {
     grid(vec![
-        ["Ducky sprite", "CC0 by Caz Creates Games"],
         ["Button SFX", "CC0 by Jaszunio15"],
-        ["Music", "CC BY 3.0 by Kevin MacLeod"],
-        [
-            "Bevy logo",
-            "All rights reserved by the Bevy Foundation, permission granted for splash screen use when unmodified",
-        ],
+        ["Music", "Going Up by Ansimuz"],
     ])
 }
 
@@ -99,7 +94,7 @@ impl FromWorld for CreditsAssets {
     fn from_world(world: &mut World) -> Self {
         let assets = world.resource::<AssetServer>();
         Self {
-            music: assets.load("audio/music/Monkeys Spinning Monkeys.ogg"),
+            music: assets.load("audio/music/Going Up.ogg"),
         }
     }
 }

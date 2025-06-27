@@ -45,7 +45,7 @@ impl FromWorld for PlayerAssets {
         let assets = world.resource::<AssetServer>();
 
         Self {
-            image: assets.load("images/character_simple.png"),
+            image: assets.load("sprites/character_simple.png"),
             atlas,
         }
     }
@@ -126,7 +126,6 @@ fn update_animation_movement(
         };
 
         if new_state != *animation_state {
-            info!("Change State");
             *animation_state = new_state;
         };
     }

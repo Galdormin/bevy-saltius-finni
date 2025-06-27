@@ -1,10 +1,6 @@
 //! A splash screen that plays briefly at startup.
 
-use bevy::{
-    image::{ImageLoaderSettings, ImageSampler},
-    input::common_conditions::input_just_pressed,
-    prelude::*,
-};
+use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 
 use crate::{AppSystems, screens::Screen, theme::prelude::*};
 
@@ -44,7 +40,7 @@ pub(super) fn plugin(app: &mut App) {
     );
 }
 
-const SPLASH_BACKGROUND_COLOR: Color = Color::srgb(0.157, 0.157, 0.157);
+const SPLASH_BACKGROUND_COLOR: Color = Color::srgb_u8(51, 41, 67);
 const SPLASH_DURATION_SECS: f32 = 1.8;
 const SPLASH_FADE_DURATION_SECS: f32 = 0.6;
 
@@ -57,19 +53,10 @@ fn spawn_splash_screen(mut commands: Commands, asset_server: Res<AssetServer>) {
             Name::new("Splash image"),
             Node {
                 margin: UiRect::all(Val::Auto),
-                width: Val::Percent(70.0),
+                width: Val::Percent(100.0),
                 ..default()
             },
-            ImageNode::new(asset_server.load_with_settings(
-                // This should be an embedded asset for instant loading, but that is
-                // currently [broken on Windows Wasm builds](https://github.com/bevyengine/bevy/issues/14246).
-                "images/splash.png",
-                |settings: &mut ImageLoaderSettings| {
-                    // Make an exception for the splash image in case
-                    // `ImagePlugin::default_nearest()` is used for pixel art.
-                    settings.sampler = ImageSampler::linear();
-                },
-            )),
+            ImageNode::new(asset_server.load("icons/hurluberlu_splash.png")),
             ImageNodeFadeInOut {
                 total_duration: SPLASH_DURATION_SECS,
                 fade_duration: SPLASH_FADE_DURATION_SECS,

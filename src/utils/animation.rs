@@ -38,7 +38,7 @@ impl SpriteAnimation {
     pub fn from_state(state: impl AnimationState) -> Self {
         let timer = state
             .get_duration()
-            .and_then(|d| Some(Timer::new(d, TimerMode::Repeating)));
+            .map(|d| Timer::new(d, TimerMode::Repeating));
 
         Self {
             timer,
@@ -77,7 +77,6 @@ pub fn update_animation_atlas<T: AnimationState>(
 
         let frame_index = animation.frame + state.get_start_frame();
         if atlas.index != frame_index {
-            info!("Frame: {}", frame_index);
             atlas.index = frame_index;
         }
     }
