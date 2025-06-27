@@ -17,7 +17,7 @@ use crate::{
         physics::{CharacterController, CharacterControllerBundle},
     },
     screens::Screen,
-    theme::palette::HEADER_TEXT,
+    ui::palette::HEADER_TEXT,
     utils::animation::SpriteAnimation,
 };
 

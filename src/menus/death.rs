@@ -2,7 +2,7 @@
 
 use bevy::prelude::*;
 
-use crate::{event::RespawnEvent, menus::Menu, theme::widget};
+use crate::{event::RespawnEvent, menus::Menu, ui::widget};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Menu::Death), spawn_death_menu);

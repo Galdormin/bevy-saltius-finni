@@ -8,7 +8,7 @@ use bevy::{
     ui::Val::*,
 };
 
-use crate::theme::{interaction::InteractionPalette, palette::*};
+use crate::ui::{palette::*, theme::UiTheme};
 
 /// A root UI node that fills the window and centers its content.
 pub fn ui_root(name: impl Into<Cow<'static, str>>) -> impl Bundle {
@@ -34,6 +34,7 @@ pub fn header(text: impl Into<String>) -> impl Bundle {
     (
         Name::new("Header"),
         Text(text.into()),
+        UiTheme::PIXEL_ART,
         TextFont::from_font_size(40.0),
         TextColor(HEADER_TEXT),
     )
@@ -44,6 +45,7 @@ pub fn label(text: impl Into<String>) -> impl Bundle {
     (
         Name::new("Label"),
         Text(text.into()),
+        UiTheme::PIXEL_ART,
         TextFont::from_font_size(24.0),
         TextColor(LABEL_TEXT),
     )
@@ -113,15 +115,11 @@ where
                 .spawn((
                     Name::new("Button Inner"),
                     Button,
-                    BackgroundColor(BUTTON_BACKGROUND),
-                    InteractionPalette {
-                        none: BUTTON_BACKGROUND,
-                        hovered: BUTTON_HOVERED_BACKGROUND,
-                        pressed: BUTTON_PRESSED_BACKGROUND,
-                    },
+                    UiTheme::PIXEL_ART,
                     children![(
                         Name::new("Button Text"),
                         Text(text),
+                        UiTheme::PIXEL_ART,
                         TextFont::from_font_size(40.0),
                         TextColor(BUTTON_TEXT),
                         // Don't bubble picking events from the text up to the button.

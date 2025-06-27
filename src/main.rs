@@ -13,7 +13,7 @@ mod menus;
 mod platformer;
 mod player;
 mod screens;
-mod theme;
+mod ui;
 mod utils;
 
 use bevy::{asset::AssetMetaCheck, prelude::*};
@@ -67,7 +67,7 @@ impl Plugin for AppPlugin {
             player::plugin,
             platformer::plugin,
             screens::plugin,
-            theme::plugin,
+            ui::plugin,
             utils::plugin,
         ));
 

@@ -4,7 +4,7 @@ use bevy::{
     ecs::spawn::SpawnIter, input::common_conditions::input_just_pressed, prelude::*, ui::Val::*,
 };
 
-use crate::{assets::collections::LevelAssets, audio::music, menus::Menu, theme::prelude::*};
+use crate::{assets::collections::LevelAssets, audio::music, menus::Menu, ui::prelude::*};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Menu::Credits), spawn_credits_menu);

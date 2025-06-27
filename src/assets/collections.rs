@@ -18,14 +18,41 @@ pub(super) fn plugin(app: &mut App) {
 
 #[derive(AssetCollection, Resource)]
 pub struct UiAssets {
-    // #[asset(path = "ui/button.png")]
-    // pub button: Handle<Image>,
+    #[asset(path = "ui/button.png")]
+    pub button_image: Handle<Image>,
+    #[asset(texture_atlas_layout(tile_size_x = 40, tile_size_y = 27, columns = 2, rows = 1))]
+    pub button_atlas: Handle<TextureAtlasLayout>,
+
+    // Fonts
+    #[asset(path = "fonts/monogram.ttf")]
+    pub monogram: Handle<Font>,
+    #[asset(path = "fonts/m6x11.ttf")]
+    pub m6x11: Handle<Font>,
 
     // Sounds
     #[asset(path = "audio/sound_effects/button_click.ogg")]
     pub hover_sound: Handle<AudioSource>,
     #[asset(path = "audio/sound_effects/button_click.ogg")]
     pub click_sound: Handle<AudioSource>,
+}
+
+impl UiAssets {
+    pub fn button_image_node(&self) -> ImageNode {
+        ImageNode {
+            image: self.button_image.clone(),
+            texture_atlas: Some(TextureAtlas::from(self.button_atlas.clone())),
+            image_mode: NodeImageMode::Sliced(TextureSlicer {
+                border: BorderRect {
+                    left: 5.0,
+                    right: 5.0,
+                    top: 5.0,
+                    bottom: 6.0,
+                },
+                ..Default::default()
+            }),
+            ..Default::default()
+        }
+    }
 }
 
 #[derive(AssetCollection, Resource)]
