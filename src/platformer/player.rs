@@ -44,25 +44,27 @@ pub struct JumpImpulse(Scalar);
 
 /// The gravitational acceleration used for a character controller.
 #[derive(Component)]
-pub struct ControllerGravity(Vector);
+pub struct ControllerGravity {
+    jump_gravity: Scalar,
+    fall_gravity: Scalar,
+    terminal_velocity: Scalar,
+}
+
+impl Default for ControllerGravity {
+    fn default() -> Self {
+        Self {
+            jump_gravity: 300.0,
+            fall_gravity: 300.0,
+            terminal_velocity: 200.0,
+        }
+    }
+}
 
 /// The maximum angle a slope can have for a character controller
 /// to be able to climb and jump. If the slope is steeper than this angle,
 /// the character will slide down.
 #[derive(Component)]
 pub struct MaxSlopeAngle(Scalar);
-
-/// A bundle that contains the components needed for a basic
-/// kinematic character controller.
-#[derive(Bundle)]
-pub struct CharacterControllerBundle {
-    character_controller: CharacterController,
-    body: RigidBody,
-    collider: Collider,
-    ground_caster: ShapeCaster,
-    gravity: ControllerGravity,
-    movement: MovementBundle,
-}
 
 /// A bundle that contains components for character movement.
 #[derive(Bundle)]
@@ -74,11 +76,11 @@ pub struct MovementBundle {
 }
 
 impl MovementBundle {
-    pub fn new(speed: Scalar, jump_impulse: Scalar, max_slope_angle: Scalar) -> Self {
+    pub fn new(speed: Scalar, jump_impulse: Scalar) -> Self {
         Self {
             speed: MovementSpeed(speed),
             jump_impulse: JumpImpulse(jump_impulse),
-            max_slope_angle: MaxSlopeAngle(max_slope_angle),
+            max_slope_angle: MaxSlopeAngle(30.0_f32.to_radians()),
             input_map: MovementBundle::default_input_map(),
         }
     }
@@ -105,12 +107,24 @@ impl MovementBundle {
 
 impl Default for MovementBundle {
     fn default() -> Self {
-        Self::new(30.0, 7.0, PI * 0.45)
+        Self::new(30.0, 7.0)
     }
 }
 
+/// A bundle that contains the components needed for a basic
+/// kinematic character controller.
+#[derive(Bundle)]
+pub struct CharacterControllerBundle {
+    character_controller: CharacterController,
+    body: RigidBody,
+    collider: Collider,
+    ground_caster: ShapeCaster,
+    gravity: ControllerGravity,
+    movement: MovementBundle,
+}
+
 impl CharacterControllerBundle {
-    pub fn new(collider: Collider, gravity: Vector) -> Self {
+    pub fn new(collider: Collider) -> Self {
         // Create shape caster as a slightly smaller version of collider
         let mut caster_shape = collider.clone();
         caster_shape.set_scale(Vector::ONE * 0.99, 10);
@@ -121,18 +135,27 @@ impl CharacterControllerBundle {
             collider,
             ground_caster: ShapeCaster::new(caster_shape, Vector::ZERO, 0.0, Dir2::NEG_Y)
                 .with_max_distance(1.0),
-            gravity: ControllerGravity(gravity),
+            gravity: ControllerGravity::default(),
             movement: MovementBundle::default(),
         }
     }
 
-    pub fn with_movement(
+    pub fn with_movement(mut self, acceleration: Scalar, jump_impulse: Scalar) -> Self {
+        self.movement = MovementBundle::new(acceleration, jump_impulse);
+        self
+    }
+
+    pub fn with_gravity(
         mut self,
-        acceleration: Scalar,
-        jump_impulse: Scalar,
-        max_slope_angle: Scalar,
+        jump_gravity: Scalar,
+        fall_gravity: Scalar,
+        terminal_velocity: Scalar,
     ) -> Self {
-        self.movement = MovementBundle::new(acceleration, jump_impulse, max_slope_angle);
+        self.gravity = ControllerGravity {
+            jump_gravity,
+            fall_gravity,
+            terminal_velocity,
+        };
         self
     }
 }
@@ -205,7 +228,17 @@ fn apply_gravity(
     let delta_time = time.delta_secs_f64().adjust_precision();
 
     for (gravity, mut linear_velocity) in &mut controllers {
-        linear_velocity.0 += gravity.0 * delta_time;
+        let gravity_force = if linear_velocity.y > 0.0 {
+            gravity.jump_gravity
+        } else {
+            gravity.fall_gravity
+        };
+
+        linear_velocity.y -= gravity_force * delta_time;
+
+        if linear_velocity.y.abs() > gravity.terminal_velocity {
+            linear_velocity.y = -gravity.terminal_velocity;
+        }
     }
 }
 

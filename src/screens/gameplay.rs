@@ -3,7 +3,9 @@
 use avian2d::prelude::{Physics, PhysicsTime};
 use bevy::{input::common_conditions::input_just_pressed, prelude::*, ui::Val::*};
 
-use crate::{Pause, menus::Menu, platformer::level::spawn_level, screens::Screen};
+use crate::{
+    Pause, event::DeathEvent, menus::Menu, platformer::level::spawn_level, screens::Screen,
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Screen::Gameplay), spawn_level);
@@ -22,6 +24,7 @@ pub(super) fn plugin(app: &mut App) {
                     .and(not(in_state(Menu::None)))
                     .and(input_just_pressed(KeyCode::KeyP)),
             ),
+            open_death_menu.run_if(in_state(Screen::Gameplay).and(not(in_state(Menu::Death)))),
         ),
     );
     app.add_systems(OnExit(Screen::Gameplay), (close_menu, unpause));
@@ -53,6 +56,30 @@ fn spawn_pause_overlay(mut commands: Commands) {
         BackgroundColor(Color::srgba(0.0, 0.0, 0.0, 0.8)),
         StateScoped(Pause(true)),
     ));
+}
+
+fn open_death_menu(
+    mut commands: Commands,
+    death_event: EventReader<DeathEvent>,
+    mut next_menu: ResMut<NextState<Menu>>,
+) {
+    if death_event.is_empty() {
+        return;
+    }
+
+    commands.spawn((
+        Name::new("Death Overlay"),
+        Node {
+            width: Percent(100.0),
+            height: Percent(100.0),
+            ..default()
+        },
+        GlobalZIndex(1),
+        BackgroundColor(Color::srgba(0.0, 0.0, 0.0, 0.8)),
+        StateScoped(Menu::Death),
+    ));
+
+    next_menu.set(Menu::Death);
 }
 
 fn open_pause_menu(mut next_menu: ResMut<NextState<Menu>>) {

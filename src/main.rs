@@ -3,15 +3,18 @@
 // Disable console on Windows for non-dev builds.
 #![cfg_attr(not(feature = "dev"), windows_subsystem = "windows")]
 
-mod asset_tracking;
+mod assets;
 mod audio;
 mod camera;
 #[cfg(feature = "dev")]
 mod dev_tools;
+mod event;
 mod menus;
 mod platformer;
+mod player;
 mod screens;
-mod theme;
+mod ui;
+mod utils;
 
 use bevy::{asset::AssetMetaCheck, prelude::*};
 
@@ -54,16 +57,27 @@ impl Plugin for AppPlugin {
 
         // Add other plugins.
         app.add_plugins((
-            asset_tracking::plugin,
+            assets::plugin,
             audio::plugin,
             camera::plugin,
             #[cfg(feature = "dev")]
             dev_tools::plugin,
+            event::plugin,
             menus::plugin,
+            player::plugin,
             platformer::plugin,
             screens::plugin,
-            theme::plugin,
+            ui::plugin,
+            utils::plugin,
         ));
+
+        // Resources
+        app.insert_resource(LdtkSettings {
+            level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
+                load_level_neighbors: true,
+            },
+            ..Default::default()
+        });
 
         // Order new `AppSystems` variants by adding them here:
         app.configure_sets(

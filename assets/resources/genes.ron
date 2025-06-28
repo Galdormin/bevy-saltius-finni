@@ -1,0 +1,43 @@
+([
+    (
+        id: 0,
+        name: "Base Gene",
+        stats: [
+            JumpAmount(2),
+            MovementSpeed(8),
+            JumpHeight(2),
+        ]
+    ),
+    (
+        id: 1,
+        name: "Rabbit Heritage",
+        stats: [
+            JumpAmount(10),
+            JumpHeight(2),
+        ]
+    ),
+    (
+        id: 2,
+        name: "Powerful Legs",
+        stats: [
+            JumpAmount(-2),
+            JumpHeight(2),
+            PowerUp("Powerful Jump"),
+        ]
+    ),
+    (
+        id: 3,
+        name: "Double Jump",
+        stats: [
+            PowerUp("Double Jump"),
+        ]
+    ),
+    (
+        id: 4,
+        name: "Steel Legs",
+        stats: [
+            JumpAmount(8),
+            JumpHeight(-1),
+        ]
+    ),
+])

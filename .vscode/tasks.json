@@ -47,7 +47,8 @@
             "args": [
                 "run",
                 "--yes",
-                "web"
+                "web",
+                "--open"
             ],
             "options": {
                 "env": {
