@@ -96,18 +96,30 @@ impl Gene {
 pub struct PlayerGenes {
     base: Gene,
     genes: Vec<usize>,
+    max_active: usize,
     known: HashMap<usize, Gene>,
 }
 
 impl PlayerGenes {
+    pub fn remaining_gene_slot(&self) -> usize {
+        self.max_active - self.genes.len()
+    }
+
     pub fn add_active_gene(&mut self, gene_id: usize) {
-        self.genes.push(gene_id);
+        if self.genes.len() < self.max_active {
+            self.genes.push(gene_id);
+        }
     }
 
     pub fn remove_active_gene(&mut self, gene_id: usize) {
         if let Some(index) = self.genes.iter().position(|gid| *gid == gene_id) {
             self.genes.remove(index);
         }
+    }
+
+    /// Return all known genes
+    pub fn known_genes(&self) -> Vec<&Gene> {
+        self.known.values().collect()
     }
 
     /// Return active genes
@@ -207,7 +219,13 @@ fn load_default_gene(
         commands.insert_resource(PlayerGenes {
             base: gene_db.0[0].clone(),
             genes: vec![1],
-            known: HashMap::from([(1, gene_db.0[1].clone()), (2, gene_db.0[2].clone())]),
+            max_active: 2,
+            known: HashMap::from([
+                (1, gene_db.0[1].clone()),
+                (2, gene_db.0[2].clone()),
+                (3, gene_db.0[3].clone()),
+                (4, gene_db.0[4].clone()),
+            ]),
         });
     }
 }

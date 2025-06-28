@@ -63,8 +63,7 @@ fn apply_interaction_atlas(
             Interaction::None => atlas.none,
             Interaction::Hovered => atlas.hovered,
             Interaction::Pressed => atlas.pressed,
-        }
-        .into();
+        };
     }
 }
 

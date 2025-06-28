@@ -64,7 +64,7 @@ where
         (
             Node {
                 width: Px(380.0),
-                height: Px(80.0),
+                height: Px(60.0),
                 align_items: AlignItems::Center,
                 justify_content: JustifyContent::Center,
                 ..default()
@@ -76,6 +76,26 @@ where
 
 /// A small square button with text and an action defined as an [`Observer`].
 pub fn button_small<E, B, M, I>(text: impl Into<String>, action: I) -> impl Bundle
+where
+    E: Event,
+    B: Bundle,
+    I: IntoObserverSystem<E, B, M>,
+{
+    button_base(
+        text,
+        action,
+        Node {
+            width: Px(340.0),
+            height: Px(40.0),
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            ..default()
+        },
+    )
+}
+
+/// A small square button with text and an action defined as an [`Observer`].
+pub fn button_icon<E, B, M, I>(text: impl Into<String>, action: I) -> impl Bundle
 where
     E: Event,
     B: Bundle,

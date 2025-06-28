@@ -64,7 +64,7 @@ fn global_volume_widget() -> impl Bundle {
             ..default()
         },
         children![
-            widget::button_small("-", lower_global_volume),
+            widget::button_icon("-", lower_global_volume),
             (
                 Name::new("Current Volume"),
                 Node {
@@ -74,7 +74,7 @@ fn global_volume_widget() -> impl Bundle {
                 },
                 children![(widget::label(""), GlobalVolumeLabel)],
             ),
-            widget::button_small("+", raise_global_volume),
+            widget::button_icon("+", raise_global_volume),
         ],
     )
 }
