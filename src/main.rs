@@ -18,7 +18,7 @@ mod utils;
 
 use bevy::{asset::AssetMetaCheck, prelude::*};
 
-use avian2d::PhysicsPlugins;
+use avian2d::{PhysicsPlugins, prelude::PhysicsLayer};
 use bevy_ecs_ldtk::prelude::*;
 use leafwing_input_manager::prelude::*;
 
@@ -137,4 +137,13 @@ impl Action {
             _ => None,
         }
     }
+}
+
+#[derive(PhysicsLayer, Default)]
+pub enum GameLayer {
+    #[default]
+    Default, // Layer 0 - the default layer that objects are assigned to
+    Player, // Layer 1
+    Ground, // Layer 2
+    Sensor, // Layer 3
 }

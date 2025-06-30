@@ -4,6 +4,8 @@ use bevy::prelude::*;
 
 use avian2d::{math::*, prelude::*};
 
+use crate::{GameLayer, platformer::level::Wall};
+
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(
         PhysicsSchedule,
@@ -54,6 +56,7 @@ pub struct CharacterControllerBundle {
     character_controller: CharacterController,
     body: RigidBody,
     collider: Collider,
+    collision_layer: CollisionLayers,
     ground_caster: ShapeCaster,
     gravity: GravityController,
 }
@@ -68,8 +71,13 @@ impl CharacterControllerBundle {
             character_controller: CharacterController,
             body: RigidBody::Kinematic,
             collider,
+            collision_layer: CollisionLayers::new(
+                GameLayer::Player,
+                [GameLayer::Ground, GameLayer::Sensor],
+            ),
             ground_caster: ShapeCaster::new(caster_shape, Vector::ZERO, 0.0, Dir2::NEG_Y)
-                .with_max_distance(1.0),
+                .with_max_distance(1.0)
+                .with_max_hits(5),
             gravity: GravityController::default(),
         }
     }
@@ -93,8 +101,15 @@ impl CharacterControllerBundle {
 fn update_grounded(
     mut commands: Commands,
     mut query: Query<(Entity, &ShapeHits), With<CharacterController>>,
+    walls: Query<Entity, With<Wall>>,
 ) {
     for (entity, hits) in &mut query {
+        // // Filter hits on wall
+        let hits = hits
+            .iter()
+            .filter(|hit_data| walls.contains(hit_data.entity))
+            .collect::<Vec<&ShapeHitData>>();
+
         // The character is grounded if the shape caster has a hit
         if !hits.is_empty() {
             commands.entity(entity).insert(Grounded);

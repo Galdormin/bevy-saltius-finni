@@ -6,6 +6,7 @@ use avian2d::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
 use crate::{
+    GameLayer,
     assets::collections::{LevelAssets, PlayerAssets},
     audio::music,
     camera::{LEVEL_HEIGHT, LEVEL_WIDTH, MainCamera},
@@ -28,7 +29,6 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(
         Update,
         (
-            spawn_wall,
             update_level_selection,
             save_respawn,
             restart_level,
@@ -40,11 +40,25 @@ pub(super) fn plugin(app: &mut App) {
 
 #[derive(Default, Component, Reflect, Debug)]
 #[reflect(Component)]
-struct Wall;
+pub struct Wall;
 
-#[derive(Default, Bundle, LdtkIntCell)]
+#[derive(Bundle, LdtkIntCell)]
 struct WallBundle {
     wall: Wall,
+    collider: Collider,
+    collision_layers: CollisionLayers,
+    body: RigidBody,
+}
+
+impl Default for WallBundle {
+    fn default() -> Self {
+        Self {
+            wall: Wall,
+            collider: Collider::rectangle(8.0, 8.0),
+            collision_layers: CollisionLayers::new(GameLayer::Ground, [GameLayer::Player]),
+            body: RigidBody::Static,
+        }
+    }
 }
 
 pub fn spawn_level(
@@ -96,14 +110,6 @@ pub fn spawn_level(
             TextColor(HEADER_TEXT)
         )],
     ));
-}
-
-fn spawn_wall(mut commands: Commands, walls: Query<Entity, Added<Wall>>) {
-    for entity in walls {
-        commands
-            .entity(entity)
-            .insert((Collider::rectangle(8.0, 8.0), RigidBody::Static));
-    }
 }
 
 fn update_level_selection(
