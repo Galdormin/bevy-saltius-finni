@@ -1,12 +1,16 @@
 //! Death menu to choose the genes
 
 use bevy::prelude::*;
-use bevy::ui::Val::*;
+
+use bevy_cobweb_ui::prelude::*;
 
 use crate::player::genes::Gene;
-use crate::{event::RespawnEvent, menus::Menu, player::genes::PlayerGenes, ui::widget};
+use crate::{menus::Menu, player::genes::PlayerGenes, ui::widget};
 
 pub(super) fn plugin(app: &mut App) {
+    app.load("ui/cobweb/death.cob");
+    app.register_component_type::<GeneContainer>();
+
     app.add_systems(
         OnEnter(Menu::Death),
         (spawn_death_menu, fill_gene_container)
@@ -21,9 +25,10 @@ pub(super) fn plugin(app: &mut App) {
 #[reflect(Component)]
 struct GeneButton(usize);
 
-#[derive(Component, Reflect, Debug)]
+#[derive(Component, Debug, Default, Reflect, PartialEq)]
 #[reflect(Component)]
 enum GeneContainer {
+    #[default]
     Active,
     Inactive,
     Known,
@@ -57,62 +62,14 @@ impl From<GeneContainer> for GeneType {
     }
 }
 
-fn spawn_death_menu(mut commands: Commands) {
-    commands.spawn((
-        widget::ui_root("Death Menu"),
-        GlobalZIndex(2),
-        StateScoped(Menu::Death),
-        children![
-            widget::header("You have died!"),
-            gene_choice(),
-            widget::button("Respawn", respawn),
-        ],
-    ));
-}
-
-fn gene_choice() -> impl Bundle {
-    (
-        Name::new("Gene menu"),
-        Node {
-            display: Display::Grid,
-            height: Percent(60.0),
-            row_gap: Px(10.0),
-            column_gap: Px(30.0),
-            grid_template_columns: RepeatedGridTrack::px(2, 400.0),
-            ..default()
+fn spawn_death_menu(mut commands: Commands, mut scene_builder: SceneBuilder) {
+    commands.ui_root().spawn_scene(
+        ("ui/cobweb/death.cob", "scene"),
+        &mut scene_builder,
+        |handle| {
+            handle.insert((StateScoped(Menu::Death), GlobalZIndex(2)));
         },
-        children![
-            (
-                Name::new("Inactive genes"),
-                Node {
-                    display: Display::Flex,
-                    align_items: AlignItems::Center,
-                    flex_direction: FlexDirection::Column,
-                    ..default()
-                },
-                GeneContainer::Inactive,
-            ),
-            (
-                Name::new("Active genes"),
-                Node {
-                    display: Display::Flex,
-                    align_items: AlignItems::Center,
-                    flex_direction: FlexDirection::Column,
-                    ..default()
-                },
-                GeneContainer::Active,
-            )
-        ],
-    )
-}
-
-fn respawn(
-    _: Trigger<Pointer<Click>>,
-    mut next_menu: ResMut<NextState<Menu>>,
-    mut respawn_event: EventWriter<RespawnEvent>,
-) {
-    next_menu.set(Menu::None);
-    respawn_event.write(RespawnEvent);
+    );
 }
 
 fn fill_gene_container(

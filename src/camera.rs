@@ -25,6 +25,7 @@ fn spawn_camera(mut commands: Commands) {
         Camera2d,
         MainCamera,
         PixelViewport,
+        WithUiScaling,
         PixelZoom::FitSize {
             width: LEVEL_WIDTH as i32,
             height: LEVEL_HEIGHT as i32,

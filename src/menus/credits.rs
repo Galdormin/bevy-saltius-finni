@@ -1,12 +1,13 @@
 //! The credits menu.
 
-use bevy::{
-    ecs::spawn::SpawnIter, input::common_conditions::input_just_pressed, prelude::*, ui::Val::*,
-};
+use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 
-use crate::{assets::collections::LevelAssets, audio::music, menus::Menu, ui::prelude::*};
+use bevy_cobweb_ui::prelude::*;
+
+use crate::{assets::collections::LevelAssets, audio::music, menus::Menu};
 
 pub(super) fn plugin(app: &mut App) {
+    app.load("ui/cobweb/credits.cob");
     app.add_systems(OnEnter(Menu::Credits), spawn_credits_menu);
     app.add_systems(
         Update,
@@ -16,65 +17,14 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Menu::Credits), start_credits_music);
 }
 
-fn spawn_credits_menu(mut commands: Commands) {
-    commands.spawn((
-        widget::ui_root("Credits Menu"),
-        GlobalZIndex(2),
-        StateScoped(Menu::Credits),
-        children![
-            widget::header("Created by"),
-            created_by(),
-            widget::header("Assets"),
-            assets(),
-            widget::button("Back", go_back_on_click),
-        ],
-    ));
-}
-
-fn created_by() -> impl Bundle {
-    grid(vec![
-        ["Galdormin", "Game Designer & Programmer"],
-        ["Nexia", "Artist"],
-    ])
-}
-
-fn assets() -> impl Bundle {
-    grid(vec![
-        ["Button SFX", "CC0 by Jaszunio15"],
-        ["Music", "Going Up by Ansimuz"],
-    ])
-}
-
-fn grid(content: Vec<[&'static str; 2]>) -> impl Bundle {
-    (
-        Name::new("Grid"),
-        Node {
-            display: Display::Grid,
-            row_gap: Px(10.0),
-            column_gap: Px(30.0),
-            grid_template_columns: RepeatedGridTrack::px(2, 400.0),
-            ..default()
+fn spawn_credits_menu(mut commands: Commands, mut scene_builder: SceneBuilder) {
+    commands.ui_root().spawn_scene(
+        ("ui/cobweb/credits.cob", "scene"),
+        &mut scene_builder,
+        |handle| {
+            handle.insert(StateScoped(Menu::Credits));
         },
-        Children::spawn(SpawnIter(content.into_iter().flatten().enumerate().map(
-            |(i, text)| {
-                (
-                    widget::label(text),
-                    Node {
-                        justify_self: if i % 2 == 0 {
-                            JustifySelf::End
-                        } else {
-                            JustifySelf::Start
-                        },
-                        ..default()
-                    },
-                )
-            },
-        ))),
-    )
-}
-
-fn go_back_on_click(_: Trigger<Pointer<Click>>, mut next_menu: ResMut<NextState<Menu>>) {
-    next_menu.set(Menu::Main);
+    );
 }
 
 fn go_back(mut next_menu: ResMut<NextState<Menu>>) {

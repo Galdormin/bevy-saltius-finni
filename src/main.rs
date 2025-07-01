@@ -19,6 +19,7 @@ mod utils;
 use bevy::{asset::AssetMetaCheck, prelude::*};
 
 use avian2d::{PhysicsPlugins, prelude::PhysicsLayer};
+use bevy_cobweb_ui::prelude::CobwebUiPlugin;
 use bevy_ecs_ldtk::prelude::*;
 use leafwing_input_manager::prelude::*;
 
@@ -53,6 +54,7 @@ impl Plugin for AppPlugin {
             PhysicsPlugins::default().with_length_unit(8.0),
             InputManagerPlugin::<Action>::default(),
             LdtkPlugin,
+            CobwebUiPlugin,
         ));
 
         // Add other plugins.
