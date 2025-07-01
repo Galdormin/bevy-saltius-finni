@@ -194,7 +194,6 @@ fn add_observer_event_button(
         if event.0 == EventType::Respawn {
             commands.entity(entity).observe(
                 move |_: Trigger<Pointer<Click>>, mut ev: EventWriter<RespawnEvent>| {
-                    info!("Test");
                     ev.write(RespawnEvent);
                 },
             );

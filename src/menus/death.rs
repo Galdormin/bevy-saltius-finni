@@ -5,7 +5,7 @@ use bevy::prelude::*;
 use bevy_cobweb_ui::prelude::*;
 
 use crate::player::genes::Gene;
-use crate::{menus::Menu, player::genes::PlayerGenes, ui::widget};
+use crate::{menus::Menu, player::genes::PlayerGenes};
 
 pub(super) fn plugin(app: &mut App) {
     app.load("ui/cobweb/death.cob");
@@ -74,6 +74,7 @@ fn spawn_death_menu(mut commands: Commands, mut scene_builder: SceneBuilder) {
 
 fn fill_gene_container(
     mut commands: Commands,
+    mut scene_builder: SceneBuilder,
     player_genes: Res<PlayerGenes>,
     containers: Query<(Entity, &GeneContainer), Added<GeneContainer>>,
 ) {
@@ -84,14 +85,24 @@ fn fill_gene_container(
             GeneContainer::Known => player_genes.known_genes(),
         };
 
-        genes.iter().for_each(|gene| {
-            commands.spawn((
-                GeneButton(gene.id),
-                GeneType::from(container),
-                widget::button_small(gene.name.clone(), toggle_gene(gene.to_owned().clone())),
-                ChildOf(entity),
-            ));
-        });
+        for gene in genes {
+            commands.ui_root().spawn_scene(
+                ("ui/cobweb/death.cob", "gene_button"),
+                &mut scene_builder,
+                |handle| {
+                    handle.get("text").update_text(gene.name.clone());
+
+                    handle
+                        .insert((
+                            Button,
+                            ChildOf(entity),
+                            GeneButton(gene.id),
+                            GeneType::from(container),
+                        ))
+                        .observe(toggle_gene(gene.to_owned().clone()));
+                },
+            );
+        }
     }
 }
 
@@ -133,17 +144,9 @@ fn update_gene_container(
 
 fn toggle_gene(
     gene: Gene,
-) -> impl Fn(
-    Trigger<Pointer<Click>>,
-    ResMut<PlayerGenes>,
-    Query<&mut GeneType, With<GeneButton>>,
-    Query<&ChildOf, With<Button>>,
-) {
-    move |trigger, mut player_genes, mut gene_buttons, buttons| {
-        let Ok(mut gene_type) = buttons
-            .get(trigger.event().target)
-            .and_then(|child| gene_buttons.get_mut(child.0))
-        else {
+) -> impl Fn(Trigger<Pointer<Click>>, ResMut<PlayerGenes>, Query<&mut GeneType, With<GeneButton>>) {
+    move |trigger, mut player_genes, mut gene_buttons| {
+        let Ok(mut gene_type) = gene_buttons.get_mut(trigger.event().target) else {
             return;
         };
 

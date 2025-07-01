@@ -11,14 +11,12 @@ use crate::{
     audio::music,
     camera::{LEVEL_HEIGHT, LEVEL_WIDTH, MainCamera},
     event::{DeathEvent, RespawnEvent},
-    platformer::hud::JumpCounter,
     player::{
         animation::PlayerAnimationState,
         movement::{Dead, JumpAmount, MovementBundle, RespawnPosition},
         physics::{CharacterController, CharacterControllerBundle},
     },
     screens::Screen,
-    ui::palette::HEADER_TEXT,
     utils::animation::SpriteAnimation,
 };
 
@@ -97,18 +95,6 @@ pub fn spawn_level(
                 RespawnPosition(Vec2::new(LEVEL_WIDTH / 2.0, -LEVEL_HEIGHT / 2.0)),
             )
         ],
-    ));
-    commands.spawn((
-        Name::new("HUD"),
-        GlobalZIndex(1),
-        StateScoped(Screen::Gameplay),
-        Node::default(),
-        children![(
-            Text("0".into()),
-            JumpCounter,
-            TextFont::from_font_size(40.0),
-            TextColor(HEADER_TEXT)
-        )],
     ));
 }
 
