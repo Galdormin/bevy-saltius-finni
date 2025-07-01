@@ -124,7 +124,6 @@ fn update_activation_devices(
         for device_entity in activated_devices.entities() {
             let _ = devices.get_mut(*device_entity).map(|mut status| {
                 status.0 = button.0;
-                ()
             });
         }
     }

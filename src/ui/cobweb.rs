@@ -153,7 +153,7 @@ fn add_observer_change_screen_button(
     buttons: Query<(Entity, &ChangeScreenButton), Added<ChangeScreenButton>>,
 ) {
     for (entity, screen) in buttons {
-        let screen = screen.0.clone();
+        let screen = screen.0;
         commands.entity(entity).observe(
             move |_: Trigger<Pointer<Click>>, mut next_screen: ResMut<NextState<Screen>>| {
                 next_screen.set(screen);
@@ -167,7 +167,7 @@ fn add_observer_change_menu_button(
     buttons: Query<(Entity, &ChangeMenuButton), Added<ChangeMenuButton>>,
 ) {
     for (entity, menu) in buttons {
-        let menu = menu.0.clone();
+        let menu = menu.0;
         commands.entity(entity).observe(
             move |_: Trigger<Pointer<Click>>, mut next_menu: ResMut<NextState<Menu>>| {
                 next_menu.set(menu);
@@ -191,16 +191,13 @@ fn add_observer_event_button(
     buttons: Query<(Entity, &EventButton), Added<EventButton>>,
 ) {
     for (entity, event) in buttons {
-        match event.0 {
-            EventType::Respawn => {
-                commands.entity(entity).observe(
-                    move |_: Trigger<Pointer<Click>>, mut ev: EventWriter<RespawnEvent>| {
-                        info!("Test");
-                        ev.write(RespawnEvent);
-                    },
-                );
-            }
-            _ => (),
+        if event.0 == EventType::Respawn {
+            commands.entity(entity).observe(
+                move |_: Trigger<Pointer<Click>>, mut ev: EventWriter<RespawnEvent>| {
+                    info!("Test");
+                    ev.write(RespawnEvent);
+                },
+            );
         }
     }
 }
