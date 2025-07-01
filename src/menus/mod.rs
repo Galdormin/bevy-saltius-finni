@@ -1,6 +1,7 @@
 //! The game's menus and transitions between them.
 
 mod credits;
+mod death;
 mod main;
 mod pause;
 mod settings;
@@ -15,10 +16,11 @@ pub(super) fn plugin(app: &mut App) {
         main::plugin,
         settings::plugin,
         pause::plugin,
+        death::plugin,
     ));
 }
 
-#[derive(States, Copy, Clone, Eq, PartialEq, Hash, Debug, Default)]
+#[derive(States, Copy, Clone, Eq, PartialEq, Reflect, Hash, Debug, Default)]
 #[states(scoped_entities)]
 pub enum Menu {
     #[default]
@@ -27,4 +29,5 @@ pub enum Menu {
     Credits,
     Settings,
     Pause,
+    Death,
 }

@@ -3,19 +3,23 @@
 // Disable console on Windows for non-dev builds.
 #![cfg_attr(not(feature = "dev"), windows_subsystem = "windows")]
 
-mod asset_tracking;
+mod assets;
 mod audio;
 mod camera;
 #[cfg(feature = "dev")]
 mod dev_tools;
+mod event;
 mod menus;
 mod platformer;
+mod player;
 mod screens;
-mod theme;
+mod ui;
+mod utils;
 
 use bevy::{asset::AssetMetaCheck, prelude::*};
 
-use avian2d::PhysicsPlugins;
+use avian2d::{PhysicsPlugins, prelude::PhysicsLayer};
+use bevy_cobweb_ui::prelude::CobwebUiPlugin;
 use bevy_ecs_ldtk::prelude::*;
 use leafwing_input_manager::prelude::*;
 
@@ -50,20 +54,32 @@ impl Plugin for AppPlugin {
             PhysicsPlugins::default().with_length_unit(8.0),
             InputManagerPlugin::<Action>::default(),
             LdtkPlugin,
+            CobwebUiPlugin,
         ));
 
         // Add other plugins.
         app.add_plugins((
-            asset_tracking::plugin,
+            assets::plugin,
             audio::plugin,
             camera::plugin,
             #[cfg(feature = "dev")]
             dev_tools::plugin,
+            event::plugin,
             menus::plugin,
+            player::plugin,
             platformer::plugin,
             screens::plugin,
-            theme::plugin,
+            ui::plugin,
+            utils::plugin,
         ));
+
+        // Resources
+        app.insert_resource(LdtkSettings {
+            level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
+                load_level_neighbors: true,
+            },
+            ..Default::default()
+        });
 
         // Order new `AppSystems` variants by adding them here:
         app.configure_sets(
@@ -123,4 +139,13 @@ impl Action {
             _ => None,
         }
     }
+}
+
+#[derive(PhysicsLayer, Default)]
+pub enum GameLayer {
+    #[default]
+    Default, // Layer 0 - the default layer that objects are assigned to
+    Player, // Layer 1
+    Ground, // Layer 2
+    Sensor, // Layer 3
 }
