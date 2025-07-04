@@ -4,12 +4,15 @@ use bevy::prelude::*;
 
 use bevy_cobweb_ui::prelude::*;
 
+use crate::event::RespawnEvent;
 use crate::player::genes::Gene;
+use crate::ui::cobweb::CobButtonRegistration;
 use crate::{menus::Menu, player::genes::PlayerGenes};
 
 pub(super) fn plugin(app: &mut App) {
     app.load("ui/cobweb/death.cob");
-    app.register_component_type::<GeneContainer>();
+    app.register_component_type::<GeneContainer>()
+        .register_button::<RespawnButton>(send_respawn_event_on_click);
 
     app.add_systems(
         OnEnter(Menu::Death),
@@ -20,6 +23,9 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_systems(Update, update_gene_container.run_if(in_state(Menu::Death)));
 }
+
+#[derive(Component, Debug, Default, Reflect, PartialEq)]
+struct RespawnButton;
 
 #[derive(Component, Reflect, Debug)]
 #[reflect(Component)]
@@ -164,4 +170,8 @@ fn toggle_gene(
             _ => (),
         }
     }
+}
+
+fn send_respawn_event_on_click(_: Trigger<Pointer<Click>>, mut ev: EventWriter<RespawnEvent>) {
+    ev.write(RespawnEvent);
 }

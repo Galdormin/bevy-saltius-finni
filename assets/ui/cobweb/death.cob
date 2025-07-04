@@ -102,7 +102,7 @@ buttons as _
     ""
         +button{
             ChangeMenuButton(None)
-            EventButton(Respawn)
+            RespawnButton
             "text"
                 TextLineText("Respawn")
         }

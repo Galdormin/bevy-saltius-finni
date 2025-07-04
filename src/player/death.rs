@@ -11,7 +11,6 @@ use crate::{
         physics::{CharacterController, Grounded},
     },
     screens::Screen,
-    utils::animation::AnimationState,
 };
 
 pub(super) fn plugin(app: &mut App) {
