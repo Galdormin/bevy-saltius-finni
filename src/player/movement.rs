@@ -21,11 +21,6 @@ pub(super) fn plugin(app: &mut App) {
     );
 }
 
-/// The position of the Respawn
-#[derive(Component, Reflect, Debug)]
-#[reflect(Component)]
-pub struct RespawnPosition(pub Vector);
-
 /// The speed used for character movement.Oh
 #[derive(Component, Reflect, Debug)]
 #[reflect(Component)]

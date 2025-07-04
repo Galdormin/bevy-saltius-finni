@@ -13,7 +13,7 @@ use crate::{
     event::DeathEvent,
     player::{
         animation::PlayerAnimationState,
-        movement::{MovementBundle, RespawnPosition},
+        movement::MovementBundle,
         physics::{CharacterController, CharacterControllerBundle, Grounded},
     },
     screens::Screen,
@@ -86,7 +86,6 @@ pub fn spawn_level(
                 CharacterControllerBundle::new(Collider::capsule(4.0, 2.0))
                     .with_gravity(250.0, 350.0, 450.0),
                 MovementBundle::default(),
-                RespawnPosition(Vec2::new(LEVEL_WIDTH / 2.0, -LEVEL_HEIGHT / 2.0)),
             )
         ],
     ));

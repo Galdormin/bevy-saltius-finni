@@ -116,21 +116,20 @@ impl StaticAttribute for TextLineText {
 pub trait CobButtonRegistration<E: Event, B: Bundle, M> {
     fn register_button<T: Component + Loadable>(
         &mut self,
-        observer: impl IntoObserverSystem<E, B, M> + Clone + Send + Sync + 'static,
+        observer: impl IntoObserverSystem<E, B, M> + Clone + Sync + 'static,
     ) -> &mut Self;
 }
 
 impl<E: Event, B: Bundle, M> CobButtonRegistration<E, B, M> for App {
     fn register_button<T: Component + Loadable>(
         &mut self,
-        observer: impl IntoObserverSystem<E, B, M> + Clone + Send + Sync + 'static,
+        observer: impl IntoObserverSystem<E, B, M> + Clone + Sync + 'static,
     ) -> &mut Self {
         self.register_component_type::<T>().add_systems(
             Update,
-            move |mut c: Commands, bs: Query<Entity, Added<T>>| {
-                for entity in bs.iter() {
-                    let o = observer.clone();
-                    c.entity(entity).observe(o);
+            move |mut commands: Commands, buttons: Query<Entity, Added<T>>| {
+                for entity in buttons.iter() {
+                    commands.entity(entity).observe(observer.clone());
                 }
             },
         )

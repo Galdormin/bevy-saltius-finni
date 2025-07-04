@@ -1,29 +1,37 @@
 //! Handle death of player
 
-use avian2d::prelude::{Collider, CollisionLayers, RigidBody, SleepingDisabled};
+use avian2d::{
+    math::Vector,
+    prelude::{Collider, CollisionLayers, RigidBody, SleepingDisabled},
+};
 use bevy::prelude::*;
 
 use crate::{
     GameLayer,
     event::{DeathEvent, RespawnEvent},
     player::{
-        movement::{JumpAmount, RespawnPosition},
+        movement::JumpAmount,
         physics::{CharacterController, Grounded},
     },
     screens::Screen,
 };
 
 pub(super) fn plugin(app: &mut App) {
+    app.insert_resource(RespawnPosition(Vec2::ZERO));
+
     app.add_systems(
         Update,
         (
             (update_dead, add_dead_on_death).chain(),
-            save_respawn,
             (spawn_body_on_death, respawn_player).chain(),
         )
             .run_if(in_state(Screen::Gameplay)),
     );
 }
+
+/// The position of the Respawn
+#[derive(Resource, Reflect, Debug)]
+pub struct RespawnPosition(pub Vector);
 
 /// A marker component indicating that the player is dead.
 #[derive(Component, Reflect, Debug)]
@@ -83,7 +91,7 @@ fn spawn_body_on_death(
     commands.spawn((
         DeadBody,
         player_sprite.clone(),
-        player_transform.clone(),
+        *player_transform,
         player_collider.clone(),
         player_childof.clone(),
         RigidBody::Kinematic,
@@ -92,29 +100,17 @@ fn spawn_body_on_death(
     ));
 }
 
-fn save_respawn(
-    player: Single<(&Transform, &mut RespawnPosition), With<CharacterController>>,
-    input: Res<ButtonInput<KeyCode>>,
-) {
-    if input.just_pressed(KeyCode::KeyT) {
-        let (transform, mut respawn_position) = player.into_inner();
-        *respawn_position = RespawnPosition(transform.translation.truncate());
-    }
-}
-
 fn respawn_player(
     mut commands: Commands,
     respawn_event: EventReader<RespawnEvent>,
-    player: Single<
-        (Entity, &mut Transform, &mut JumpAmount, &RespawnPosition),
-        With<CharacterController>,
-    >,
+    respawn_position: Res<RespawnPosition>,
+    player: Single<(Entity, &mut Transform, &mut JumpAmount), With<CharacterController>>,
 ) {
     if respawn_event.is_empty() {
         return;
     }
 
-    let (entity, mut transform, mut jump_amount, respawn_position) = player.into_inner();
+    let (entity, mut transform, mut jump_amount) = player.into_inner();
 
     transform.translation = respawn_position.0.extend(0.0);
 
