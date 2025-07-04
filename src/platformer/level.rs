@@ -10,15 +10,13 @@ use crate::{
     assets::collections::{LevelAssets, PlayerAssets},
     audio::music,
     camera::{LEVEL_HEIGHT, LEVEL_WIDTH, MainCamera},
-    event::{DeathEvent, RespawnEvent},
-    platformer::hud::JumpCounter,
+    event::DeathEvent,
     player::{
         animation::PlayerAnimationState,
-        movement::{Dead, JumpAmount, MovementBundle, RespawnPosition},
-        physics::{CharacterController, CharacterControllerBundle},
+        movement::MovementBundle,
+        physics::{CharacterController, CharacterControllerBundle, Grounded},
     },
     screens::Screen,
-    ui::palette::HEADER_TEXT,
     utils::animation::SpriteAnimation,
 };
 
@@ -28,13 +26,7 @@ pub(super) fn plugin(app: &mut App) {
     app.register_ldtk_int_cell::<WallBundle>(1);
     app.add_systems(
         Update,
-        (
-            update_level_selection,
-            save_respawn,
-            restart_level,
-            respawn_player,
-        )
-            .run_if(in_state(Screen::Gameplay)),
+        (update_level_selection, restart_level).run_if(in_state(Screen::Gameplay)),
     );
 }
 
@@ -94,21 +86,8 @@ pub fn spawn_level(
                 CharacterControllerBundle::new(Collider::capsule(4.0, 2.0))
                     .with_gravity(250.0, 350.0, 450.0),
                 MovementBundle::default(),
-                RespawnPosition(Vec2::new(LEVEL_WIDTH / 2.0, -LEVEL_HEIGHT / 2.0)),
             )
         ],
-    ));
-    commands.spawn((
-        Name::new("HUD"),
-        GlobalZIndex(1),
-        StateScoped(Screen::Gameplay),
-        Node::default(),
-        children![(
-            Text("0".into()),
-            JumpCounter,
-            TextFont::from_font_size(40.0),
-            TextColor(HEADER_TEXT)
-        )],
     ));
 }
 
@@ -145,38 +124,12 @@ fn update_level_selection(
     }
 }
 
-fn restart_level(mut death_event: EventWriter<DeathEvent>, input: Res<ButtonInput<KeyCode>>) {
-    if input.just_pressed(KeyCode::KeyR) {
+fn restart_level(
+    mut death_event: EventWriter<DeathEvent>,
+    input: Res<ButtonInput<KeyCode>>,
+    player_grounded: Single<Has<Grounded>, With<CharacterController>>,
+) {
+    if input.just_pressed(KeyCode::KeyR) && *player_grounded {
         death_event.write(DeathEvent);
     }
-}
-
-fn save_respawn(
-    player: Single<(&Transform, &mut RespawnPosition), With<CharacterController>>,
-    input: Res<ButtonInput<KeyCode>>,
-) {
-    if input.just_pressed(KeyCode::KeyT) {
-        let (transform, mut respawn_position) = player.into_inner();
-        *respawn_position = RespawnPosition(transform.translation.truncate());
-    }
-}
-
-fn respawn_player(
-    mut commands: Commands,
-    respawn_event: EventReader<RespawnEvent>,
-    player: Single<
-        (Entity, &mut Transform, &mut JumpAmount, &RespawnPosition),
-        With<CharacterController>,
-    >,
-) {
-    if respawn_event.is_empty() {
-        return;
-    }
-
-    let (entity, mut transform, mut jump_amount, respawn_position) = player.into_inner();
-
-    transform.translation = respawn_position.0.extend(0.0);
-
-    jump_amount.reset();
-    commands.entity(entity).remove::<Dead>();
 }

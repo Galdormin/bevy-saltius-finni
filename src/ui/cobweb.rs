@@ -1,6 +1,7 @@
 //! Plugin to define different Cobweb components
 
 use bevy::{
+    ecs::system::IntoObserverSystem,
     prelude::*,
     text::{ComputedTextBlock, TextLayoutInfo},
     ui::{ContentSize, widget::TextNodeFlags},
@@ -9,26 +10,15 @@ use bevy::{
 use bevy_cobweb::prelude::*;
 use bevy_cobweb_ui::prelude::*;
 
-use crate::{event::RespawnEvent, menus::Menu, screens::Screen};
+use crate::{menus::Menu, screens::Screen};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_static::<TextLineFont>()
         .register_static::<TextLineText>();
 
-    app.register_component_type::<ChangeScreenButton>()
-        .register_component_type::<ChangeMenuButton>()
-        .register_component_type::<QuitButton>()
-        .register_component_type::<EventButton>();
-
-    app.add_systems(
-        Update,
-        (
-            add_observer_event_button,
-            add_observer_change_screen_button,
-            add_observer_change_menu_button,
-            add_observer_quit_button,
-        ),
-    );
+    app.register_button::<ChangeScreenButton>(change_screen)
+        .register_button::<ChangeMenuButton>(change_menu)
+        .register_button::<QuitButton>(quit_app);
 }
 
 /* Cobweb missing component */
@@ -123,6 +113,29 @@ impl StaticAttribute for TextLineText {
     }
 }
 
+pub trait CobButtonRegistration<E: Event, B: Bundle, M> {
+    fn register_button<T: Component + Loadable>(
+        &mut self,
+        observer: impl IntoObserverSystem<E, B, M> + Clone + Sync + 'static,
+    ) -> &mut Self;
+}
+
+impl<E: Event, B: Bundle, M> CobButtonRegistration<E, B, M> for App {
+    fn register_button<T: Component + Loadable>(
+        &mut self,
+        observer: impl IntoObserverSystem<E, B, M> + Clone + Sync + 'static,
+    ) -> &mut Self {
+        self.register_component_type::<T>().add_systems(
+            Update,
+            move |mut commands: Commands, buttons: Query<Entity, Added<T>>| {
+                for entity in buttons.iter() {
+                    commands.entity(entity).observe(observer.clone());
+                }
+            },
+        )
+    }
+}
+
 /* Custom Cobweb component */
 
 /// Cobweb component to change [`Screen`] on click
@@ -137,67 +150,26 @@ struct ChangeMenuButton(Menu);
 #[derive(Component, Debug, Default, Reflect, PartialEq)]
 struct QuitButton;
 
-#[derive(Debug, Default, Reflect, PartialEq)]
-enum EventType {
-    #[default]
-    None,
-    Respawn,
+fn quit_app(_: Trigger<Pointer<Click>>, mut app_exit: EventWriter<AppExit>) {
+    app_exit.write(AppExit::Success);
 }
 
-/// Cobweb component to send an event on click
-#[derive(Component, Debug, Default, Reflect, PartialEq)]
-struct EventButton(EventType);
-
-fn add_observer_change_screen_button(
-    mut commands: Commands,
-    buttons: Query<(Entity, &ChangeScreenButton), Added<ChangeScreenButton>>,
+fn change_screen(
+    trigger: Trigger<Pointer<Click>>,
+    mut next_screen: ResMut<NextState<Screen>>,
+    buttons: Query<&ChangeScreenButton>,
 ) {
-    for (entity, screen) in buttons {
-        let screen = screen.0;
-        commands.entity(entity).observe(
-            move |_: Trigger<Pointer<Click>>, mut next_screen: ResMut<NextState<Screen>>| {
-                next_screen.set(screen);
-            },
-        );
+    if let Ok(button) = buttons.get(trigger.target) {
+        next_screen.set(button.0);
     }
 }
 
-fn add_observer_change_menu_button(
-    mut commands: Commands,
-    buttons: Query<(Entity, &ChangeMenuButton), Added<ChangeMenuButton>>,
+fn change_menu(
+    trigger: Trigger<Pointer<Click>>,
+    mut next_menu: ResMut<NextState<Menu>>,
+    buttons: Query<&ChangeMenuButton>,
 ) {
-    for (entity, menu) in buttons {
-        let menu = menu.0;
-        commands.entity(entity).observe(
-            move |_: Trigger<Pointer<Click>>, mut next_menu: ResMut<NextState<Menu>>| {
-                next_menu.set(menu);
-            },
-        );
-    }
-}
-
-fn add_observer_quit_button(mut commands: Commands, buttons: Query<Entity, Added<QuitButton>>) {
-    for entity in buttons {
-        commands.entity(entity).observe(
-            move |_: Trigger<Pointer<Click>>, mut app_exit: EventWriter<AppExit>| {
-                app_exit.write(AppExit::Success);
-            },
-        );
-    }
-}
-
-fn add_observer_event_button(
-    mut commands: Commands,
-    buttons: Query<(Entity, &EventButton), Added<EventButton>>,
-) {
-    for (entity, event) in buttons {
-        if event.0 == EventType::Respawn {
-            commands.entity(entity).observe(
-                move |_: Trigger<Pointer<Click>>, mut ev: EventWriter<RespawnEvent>| {
-                    info!("Test");
-                    ev.write(RespawnEvent);
-                },
-            );
-        }
+    if let Ok(button) = buttons.get(trigger.target) {
+        next_menu.set(button.0);
     }
 }
