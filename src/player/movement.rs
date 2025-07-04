@@ -5,7 +5,8 @@ use bevy::prelude::*;
 use avian2d::{math::*, prelude::*};
 use leafwing_input_manager::prelude::*;
 
-use crate::event::{DeathEvent, JumpEvent};
+use crate::event::JumpEvent;
+use crate::player::death::Dead;
 use crate::player::physics::{CharacterController, Grounded};
 use crate::{Action, AppSystems, PausableSystems};
 
@@ -13,7 +14,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_event::<JumpEvent>();
     app.add_systems(
         Update,
-        (update_dead, update_coyote_timer, movement, jump)
+        (update_coyote_timer, movement, jump)
             .chain()
             .in_set(AppSystems::RecordInput)
             .in_set(PausableSystems),
@@ -69,12 +70,6 @@ impl JumpAmount {
         self.remaining = self.max;
     }
 }
-
-/// A marker component indicating that the player is dead.
-#[derive(Component, Reflect, Debug)]
-#[reflect(Component)]
-#[component(storage = "SparseSet")]
-pub struct Dead;
 
 /// A bundle that contains components for character movement.
 #[derive(Bundle)]
@@ -160,19 +155,6 @@ fn movement(
     }
 
     linear_velocity.x = (direction as Scalar) * movement_speed.0;
-}
-
-/// Detect the last jump of the player and trigger "Dead" behavior
-fn update_dead(
-    mut commands: Commands,
-    mut death_event: EventWriter<DeathEvent>,
-    player: Single<(Entity, &JumpAmount), (Added<Grounded>, With<CharacterController>)>,
-) {
-    let (entity, jump_amount) = player.into_inner();
-    if jump_amount.remaining == 0 {
-        commands.entity(entity).insert(Dead);
-        death_event.write(DeathEvent);
-    }
 }
 
 /// Update the coyote timer every frame
