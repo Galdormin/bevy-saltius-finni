@@ -36,21 +36,21 @@ LoadImages[
 
     ""
         +button{
-            ChangeScreenButton(Gameplay)
+            StateButton<Screen>(Gameplay)
             "text"
                 TextLineText("Play")
         }
 
     ""
         +button{
-            ChangeMenuButton(Settings)
+            StateButton<Menu>(Settings)
             "text"
                 TextLineText("Settings")
         }
 
     ""
         +button{
-            ChangeMenuButton(Credits)
+            StateButton<Menu>(Credits)
             "text"
                 TextLineText("Credits")
         }
