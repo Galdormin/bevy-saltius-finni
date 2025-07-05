@@ -1,4 +1,4 @@
-//! Plugin to define different Cobweb components
+//! Define Cobweb missing attributes
 
 use bevy::{
     prelude::*,

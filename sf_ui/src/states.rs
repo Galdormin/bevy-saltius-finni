@@ -2,8 +2,13 @@
 
 use bevy::prelude::*;
 
+use crate::prelude::*;
+
 pub(super) fn plugin(app: &mut App) {
     app.init_state::<Screen>().init_state::<Menu>();
+
+    app.register_button_state::<Screen>()
+        .register_button_state::<Menu>();
 }
 
 /// The different state of the game

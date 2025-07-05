@@ -19,21 +19,21 @@ buttons as _
 
     ""
         +button{
-            ChangeMenuButton(None)
+            StateButton<Menu>(None)
             "text"
                 TextLineText("Continue")
         }
 
     ""
         +button{
-            ChangeMenuButton(Settings)
+            StateButton<Menu>(Settings)
             "text"
                 TextLineText("Settings")
         }
 
     ""
         +button{
-            ChangeScreenButton(Title)
+            StateButton<Screen>(Title)
             "text"
                 TextLineText("Quit to title")
         }
