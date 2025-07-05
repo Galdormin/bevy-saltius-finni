@@ -5,6 +5,8 @@ use bevy::{prelude::*, sprite::Anchor};
 use avian2d::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
+use sf_ui::prelude::Screen;
+
 use crate::{
     GameLayer,
     assets::collections::{LevelAssets, PlayerAssets},
@@ -16,7 +18,6 @@ use crate::{
         movement::MovementBundle,
         physics::{CharacterController, CharacterControllerBundle, Grounded},
     },
-    screens::Screen,
     utils::animation::SpriteAnimation,
 };
 

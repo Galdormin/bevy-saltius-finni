@@ -5,7 +5,7 @@ use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 use bevy_ecs_ldtk::assets::LdtkProject;
 
-use crate::screens::Screen;
+use sf_ui::prelude::Screen;
 
 pub(super) fn plugin(app: &mut App) {
     app.configure_loading_state(

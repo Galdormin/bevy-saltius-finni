@@ -5,7 +5,7 @@ use bevy::{
     ui::UiDebugOptions,
 };
 
-use crate::screens::Screen;
+use sf_ui::prelude::Screen;
 
 pub(super) fn plugin(app: &mut App) {
     // Log `Screen` state transitions.

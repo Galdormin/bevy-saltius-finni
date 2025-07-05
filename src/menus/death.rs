@@ -4,10 +4,11 @@ use bevy::prelude::*;
 
 use bevy_cobweb_ui::prelude::*;
 
+use sf_ui::prelude::{CobButtonRegistration, Menu};
+
 use crate::event::RespawnEvent;
 use crate::player::genes::Gene;
-use crate::ui::cobweb::CobButtonRegistration;
-use crate::{menus::Menu, player::genes::PlayerGenes};
+use crate::player::genes::PlayerGenes;
 
 pub(super) fn plugin(app: &mut App) {
     app.load("ui/cobweb/death.cob");

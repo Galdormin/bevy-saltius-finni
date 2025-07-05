@@ -4,10 +4,9 @@ use bevy::prelude::*;
 
 use bevy_cobweb_ui::prelude::*;
 
-use crate::{
-    player::{movement::JumpAmount, physics::CharacterController},
-    screens::Screen,
-};
+use sf_ui::prelude::Screen;
+
+use crate::player::{movement::JumpAmount, physics::CharacterController};
 
 pub(super) fn plugin(app: &mut App) {
     app.load("ui/cobweb/hud.cob");

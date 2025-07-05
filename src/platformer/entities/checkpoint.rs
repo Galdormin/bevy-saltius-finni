@@ -3,7 +3,9 @@ use bevy::prelude::*;
 use avian2d::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-use crate::{GameLayer, platformer::level::Wall, player::death::RespawnPosition, screens::Screen};
+use sf_ui::prelude::Screen;
+
+use crate::{GameLayer, platformer::level::Wall, player::death::RespawnPosition};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_ldtk_entity::<CheckpointBundle>("Checkpoint");

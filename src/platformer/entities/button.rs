@@ -3,7 +3,9 @@ use bevy::prelude::*;
 use avian2d::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-use crate::{GameLayer, screens::Screen};
+use sf_ui::prelude::Screen;
+
+use crate::GameLayer;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_ldtk_entity::<PushButtonBundle>("Button");

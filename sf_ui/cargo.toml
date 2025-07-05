@@ -1,0 +1,12 @@
+[package]
+name = "sf_ui"
+version.workspace = true
+edition.workspace = true
+description.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+bevy = { workspace = true }
+bevy_cobweb_ui = { workspace = true }
+bevy_cobweb = { workspace = true }
