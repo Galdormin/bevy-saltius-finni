@@ -23,6 +23,8 @@ use bevy_cobweb_ui::prelude::CobwebUiPlugin;
 use bevy_ecs_ldtk::prelude::*;
 use leafwing_input_manager::prelude::*;
 
+use sf_ui::plugin::SfUiPlugin;
+
 fn main() -> AppExit {
     App::new().add_plugins(AppPlugin).run()
 }
@@ -55,6 +57,7 @@ impl Plugin for AppPlugin {
             InputManagerPlugin::<Action>::default(),
             LdtkPlugin,
             CobwebUiPlugin,
+            SfUiPlugin,
         ));
 
         // Add other plugins.

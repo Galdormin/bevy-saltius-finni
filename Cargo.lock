@@ -1331,6 +1331,7 @@ dependencies = [
  "log",
  "rand 0.9.1",
  "serde",
+ "sf_ui",
  "tracing",
 ]
 
@@ -4959,6 +4960,15 @@ dependencies = [
  "ryu",
  "serde",
  "unsafe-libyaml",
+]
+
+[[package]]
+name = "sf_ui"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_cobweb",
+ "bevy_cobweb_ui",
 ]
 
 [[package]]

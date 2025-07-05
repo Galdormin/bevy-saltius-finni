@@ -1,7 +1,6 @@
 //! Plugin to define different Cobweb components
 
 use bevy::{
-    ecs::system::IntoObserverSystem,
     prelude::*,
     text::{ComputedTextBlock, TextLayoutInfo},
     ui::{ContentSize, widget::TextNodeFlags},
@@ -10,15 +9,9 @@ use bevy::{
 use bevy_cobweb::prelude::*;
 use bevy_cobweb_ui::prelude::*;
 
-use crate::{menus::Menu, screens::Screen};
-
 pub(super) fn plugin(app: &mut App) {
     app.register_static::<TextLineFont>()
         .register_static::<TextLineText>();
-
-    app.register_button::<ChangeScreenButton>(change_screen)
-        .register_button::<ChangeMenuButton>(change_menu)
-        .register_button::<QuitButton>(quit_app);
 }
 
 /* Cobweb missing component */
@@ -110,66 +103,5 @@ impl StaticAttribute for TextLineText {
     type Value = String;
     fn construct(value: Self::Value) -> Self {
         TextLineText(value)
-    }
-}
-
-pub trait CobButtonRegistration<E: Event, B: Bundle, M> {
-    fn register_button<T: Component + Loadable>(
-        &mut self,
-        observer: impl IntoObserverSystem<E, B, M> + Clone + Sync + 'static,
-    ) -> &mut Self;
-}
-
-impl<E: Event, B: Bundle, M> CobButtonRegistration<E, B, M> for App {
-    fn register_button<T: Component + Loadable>(
-        &mut self,
-        observer: impl IntoObserverSystem<E, B, M> + Clone + Sync + 'static,
-    ) -> &mut Self {
-        self.register_component_type::<T>().add_systems(
-            Update,
-            move |mut commands: Commands, buttons: Query<Entity, Added<T>>| {
-                for entity in buttons.iter() {
-                    commands.entity(entity).observe(observer.clone());
-                }
-            },
-        )
-    }
-}
-
-/* Custom Cobweb component */
-
-/// Cobweb component to change [`Screen`] on click
-#[derive(Component, Debug, Default, Reflect, PartialEq)]
-struct ChangeScreenButton(Screen);
-
-/// Cobweb component to change [`Menu`] on click
-#[derive(Component, Debug, Default, Reflect, PartialEq)]
-struct ChangeMenuButton(Menu);
-
-/// Cobweb component to quit on click
-#[derive(Component, Debug, Default, Reflect, PartialEq)]
-struct QuitButton;
-
-fn quit_app(_: Trigger<Pointer<Click>>, mut app_exit: EventWriter<AppExit>) {
-    app_exit.write(AppExit::Success);
-}
-
-fn change_screen(
-    trigger: Trigger<Pointer<Click>>,
-    mut next_screen: ResMut<NextState<Screen>>,
-    buttons: Query<&ChangeScreenButton>,
-) {
-    if let Ok(button) = buttons.get(trigger.target) {
-        next_screen.set(button.0);
-    }
-}
-
-fn change_menu(
-    trigger: Trigger<Pointer<Click>>,
-    mut next_menu: ResMut<NextState<Menu>>,
-    buttons: Query<&ChangeMenuButton>,
-) {
-    if let Ok(button) = buttons.get(trigger.target) {
-        next_menu.set(button.0);
     }
 }

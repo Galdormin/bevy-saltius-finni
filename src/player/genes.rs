@@ -6,9 +6,10 @@ use bevy::{math::FloatPow, prelude::*};
 use bevy_common_assets::ron::RonAssetPlugin;
 use serde::Deserialize;
 
+use sf_ui::prelude::Screen;
+
 use crate::player::movement::{JumpAmount, JumpImpulse, MovementSpeed};
 use crate::player::physics::{CharacterController, GravityController};
-use crate::screens::Screen;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(RonAssetPlugin::<GeneDatabase>::new(&["genes.ron"]));

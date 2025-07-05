@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use bevy_asset_loader::prelude::*;
 
-use crate::screens::Screen;
+use sf_ui::prelude::Screen;
 
 pub mod collections;
 

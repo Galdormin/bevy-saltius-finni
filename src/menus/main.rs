@@ -4,7 +4,7 @@ use bevy::prelude::*;
 
 use bevy_cobweb_ui::prelude::*;
 
-use crate::menus::Menu;
+use sf_ui::prelude::Menu;
 
 pub(super) fn plugin(app: &mut App) {
     app.load("ui/cobweb/main.cob")

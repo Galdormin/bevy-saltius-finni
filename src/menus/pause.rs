@@ -4,7 +4,7 @@ use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 
 use bevy_cobweb_ui::prelude::*;
 
-use crate::menus::Menu;
+use sf_ui::prelude::Menu;
 
 pub(super) fn plugin(app: &mut App) {
     app.load("ui/cobweb/pause.cob");
