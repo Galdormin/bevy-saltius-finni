@@ -114,7 +114,7 @@ fn respawn_player(
 
     let (entity, mut transform, mut jump_amount) = player.into_inner();
 
-    transform.translation = respawn_position.0.extend(0.0);
+    transform.translation = respawn_position.0.extend(transform.translation.z);
 
     jump_amount.reset();
     commands.entity(entity).remove::<Dead>();

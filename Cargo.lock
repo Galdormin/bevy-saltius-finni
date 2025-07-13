@@ -575,12 +575,13 @@ dependencies = [
 
 [[package]]
 name = "bevy_cobweb_ui"
-version = "0.20.1"
+version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c377bc3edb5f8f528971184b123701ba4f3f072ef135ed1c8e4ec950936de88"
+checksum = "8a651e6b3abf50a37aae21c560be827292a803a86dedb8377c08ee17c9fc3792"
 dependencies = [
  "bevy",
  "bevy_cobweb",
+ "bevy_cobweb_ui_core",
  "bevy_cobweb_ui_derive",
  "bevy_slow_text_outline",
  "cob_sickle_macros",
@@ -602,6 +603,26 @@ dependencies = [
  "thiserror 1.0.69",
  "tracing",
  "unic-langid",
+ "wasm-timer",
+]
+
+[[package]]
+name = "bevy_cobweb_ui_core"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "27e5b3c755ac5315daf01dca43afddc408aca8bd7aab0c4ac8ebd0b238201f2a"
+dependencies = [
+ "bevy",
+ "bevy_cobweb",
+ "bevy_slow_text_outline",
+ "cob_sickle_math",
+ "cob_sickle_ui_scaffold",
+ "cobweb_asset_format",
+ "nom",
+ "serde",
+ "smallvec",
+ "thiserror 1.0.69",
+ "tracing",
  "wasm-timer",
 ]
 
