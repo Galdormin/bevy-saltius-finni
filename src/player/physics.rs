@@ -15,7 +15,7 @@ pub(super) fn plugin(app: &mut App) {
             kinematic_controller_collisions,
         )
             .chain()
-            .in_set(NarrowPhaseSet::Last),
+            .in_set(NarrowPhaseSystems::Last),
     );
 }
 

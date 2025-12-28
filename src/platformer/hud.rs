@@ -28,7 +28,7 @@ fn spawn_hud(mut commands: Commands, mut scene_builder: SceneBuilder) {
     commands
         .ui_root()
         .spawn_scene(("ui/cobweb/hud.cob", "hud"), &mut scene_builder, |handle| {
-            handle.insert((StateScoped(Screen::Gameplay), GlobalZIndex(1)));
+            handle.insert((DespawnOnExit(Screen::Gameplay), GlobalZIndex(1)));
         });
 }
 

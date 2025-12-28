@@ -138,12 +138,12 @@ fn update_restart_position(
 }
 
 fn detect_checkpoint_activation(
-    trigger: Trigger<OnCollisionStart>,
+    trigger: On<CollisionStart>,
     checkpoints_base: Query<&ChildOf, With<CheckpointScan>>,
     mut checkpoints: Query<(Entity, &mut Checkpoint)>,
 ) {
     if let Ok(checkpoint_entity) = checkpoints_base
-        .get(trigger.target())
+        .get(trigger.event_target())
         .map(|ChildOf(parent)| parent)
     {
         checkpoints

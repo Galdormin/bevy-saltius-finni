@@ -1,13 +1,9 @@
 //! Handle death of player
 
-use avian2d::{
-    math::Vector,
-    prelude::{Collider, CollisionLayers, RigidBody, SleepingDisabled},
-};
+use avian2d::math::Vector;
 use bevy::prelude::*;
 
 use crate::{
-    GameLayer,
     event::{DeathEvent, RespawnEvent},
     player::{
         movement::JumpAmount,
@@ -43,21 +39,9 @@ pub struct Dead;
 #[reflect(Component)]
 pub struct DeadBody;
 
-#[derive(Default, Bundle)]
-struct DeadBodyBundle {
-    dead_body: DeadBody,
-    sprite: Sprite,
-    transform: Transform,
-
-    // Physics
-    body: RigidBody,
-    collider: Collider,
-    collision_layer: CollisionLayers,
-}
-
 /// Detect the last jump of the player and trigger "Dead" behavior
 fn update_dead(
-    mut death_event: EventWriter<DeathEvent>,
+    mut death_event: MessageWriter<DeathEvent>,
     jump_amount: Single<&JumpAmount, (Added<Grounded>, With<CharacterController>)>,
 ) {
     if jump_amount.remaining == 0 {
@@ -67,7 +51,7 @@ fn update_dead(
 
 fn add_dead_on_death(
     mut commands: Commands,
-    death_event: EventReader<DeathEvent>,
+    death_event: MessageReader<DeathEvent>,
     player: Single<Entity, With<CharacterController>>,
 ) {
     if !death_event.is_empty() {
@@ -77,8 +61,8 @@ fn add_dead_on_death(
 
 fn spawn_body_on_death(
     mut commands: Commands,
-    mut respawn_event: EventReader<RespawnEvent>,
-    player: Single<(&Sprite, &Transform, &Collider, &ChildOf), With<CharacterController>>,
+    mut respawn_event: MessageReader<RespawnEvent>,
+    player: Single<(&Sprite, &Transform, &ChildOf), With<CharacterController>>,
 ) {
     if respawn_event.is_empty() {
         return;
@@ -86,23 +70,19 @@ fn spawn_body_on_death(
 
     respawn_event.clear();
 
-    let (player_sprite, player_transform, player_collider, player_childof) = *player;
+    let (player_sprite, player_transform, player_childof) = *player;
 
     commands.spawn((
         DeadBody,
         player_sprite.clone(),
         *player_transform,
-        player_collider.clone(),
         player_childof.clone(),
-        RigidBody::Kinematic,
-        SleepingDisabled,
-        CollisionLayers::new(GameLayer::Player, [GameLayer::Ground, GameLayer::Sensor]),
     ));
 }
 
 fn respawn_player(
     mut commands: Commands,
-    respawn_event: EventReader<RespawnEvent>,
+    respawn_event: MessageReader<RespawnEvent>,
     respawn_position: Res<RespawnPosition>,
     player: Single<(Entity, &mut Transform, &mut JumpAmount), With<CharacterController>>,
 ) {

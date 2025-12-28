@@ -96,7 +96,7 @@ fn update_font_theme(
         if let Some(mut textfont) = maybe_textfont {
             textfont.font = font;
         } else {
-            commands.entity(entity).insert(TextFont::from_font(font));
+            commands.entity(entity).insert(TextFont::from(font));
         }
     }
 }

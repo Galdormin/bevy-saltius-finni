@@ -22,7 +22,7 @@ fn spawn_credits_menu(mut commands: Commands, mut scene_builder: SceneBuilder) {
         ("ui/cobweb/credits.cob", "scene"),
         &mut scene_builder,
         |handle| {
-            handle.insert(StateScoped(Menu::Credits));
+            handle.insert(DespawnOnExit(Menu::Credits));
         },
     );
 }
@@ -34,7 +34,7 @@ fn go_back(mut next_menu: ResMut<NextState<Menu>>) {
 fn start_credits_music(mut commands: Commands, level_assets: Res<LevelAssets>) {
     commands.spawn((
         Name::new("Credits Music"),
-        StateScoped(Menu::Credits),
+        DespawnOnExit(Menu::Credits),
         music(level_assets.music.clone()),
     ));
 }

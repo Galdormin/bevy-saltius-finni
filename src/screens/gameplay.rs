@@ -54,13 +54,13 @@ fn spawn_pause_overlay(mut commands: Commands) {
         },
         GlobalZIndex(1),
         BackgroundColor(Color::srgba(0.0, 0.0, 0.0, 0.8)),
-        StateScoped(Pause(true)),
+        DespawnOnExit(Pause(true)),
     ));
 }
 
 fn open_death_menu(
     mut commands: Commands,
-    death_event: EventReader<DeathEvent>,
+    death_event: MessageReader<DeathEvent>,
     mut next_menu: ResMut<NextState<Menu>>,
 ) {
     if death_event.is_empty() {
@@ -76,7 +76,7 @@ fn open_death_menu(
         },
         GlobalZIndex(1),
         BackgroundColor(Color::srgba(0.0, 0.0, 0.0, 0.8)),
-        StateScoped(Menu::Death),
+        DespawnOnExit(Menu::Death),
     ));
 
     next_menu.set(Menu::Death);
