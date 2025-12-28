@@ -13,7 +13,7 @@ fn spawn_loading_screen(mut commands: Commands) {
     info!("Start Loading");
     commands.spawn((
         widget::ui_root("Loading Screen"),
-        StateScoped(Screen::Loading),
+        DespawnOnExit(Screen::Loading),
         children![widget::label("Loading...")],
     ));
 }

@@ -113,14 +113,14 @@ impl StaticAttribute for TextLineText {
     }
 }
 
-pub trait CobButtonRegistration<E: Event, B: Bundle, M> {
+pub trait CobButtonRegistration<E: bevy::prelude::EntityEvent, B: Bundle, M> {
     fn register_button<T: Component + Loadable>(
         &mut self,
         observer: impl IntoObserverSystem<E, B, M> + Clone + Sync + 'static,
     ) -> &mut Self;
 }
 
-impl<E: Event, B: Bundle, M> CobButtonRegistration<E, B, M> for App {
+impl<E: bevy::prelude::EntityEvent, B: Bundle, M> CobButtonRegistration<E, B, M> for App {
     fn register_button<T: Component + Loadable>(
         &mut self,
         observer: impl IntoObserverSystem<E, B, M> + Clone + Sync + 'static,
@@ -150,26 +150,26 @@ struct ChangeMenuButton(Menu);
 #[derive(Component, Debug, Default, Reflect, PartialEq)]
 struct QuitButton;
 
-fn quit_app(_: Trigger<Pointer<Click>>, mut app_exit: EventWriter<AppExit>) {
+fn quit_app(_: On<Pointer<Click>>, mut app_exit: MessageWriter<AppExit>) {
     app_exit.write(AppExit::Success);
 }
 
 fn change_screen(
-    trigger: Trigger<Pointer<Click>>,
+    trigger: On<Pointer<Click>>,
     mut next_screen: ResMut<NextState<Screen>>,
     buttons: Query<&ChangeScreenButton>,
 ) {
-    if let Ok(button) = buttons.get(trigger.target) {
+    if let Ok(button) = buttons.get(trigger.entity) {
         next_screen.set(button.0);
     }
 }
 
 fn change_menu(
-    trigger: Trigger<Pointer<Click>>,
+    trigger: On<Pointer<Click>>,
     mut next_menu: ResMut<NextState<Menu>>,
     buttons: Query<&ChangeMenuButton>,
 ) {
-    if let Ok(button) = buttons.get(trigger.target) {
+    if let Ok(button) = buttons.get(trigger.entity) {
         next_menu.set(button.0);
     }
 }

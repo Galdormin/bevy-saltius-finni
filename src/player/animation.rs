@@ -3,7 +3,7 @@
 use std::time::Duration;
 
 use avian2d::prelude::LinearVelocity;
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::Anchor};
 
 use crate::{
     assets::collections::PlayerAssets,
@@ -11,7 +11,9 @@ use crate::{
         death::Dead,
         physics::{CharacterController, Grounded},
     },
-    utils::animation::{AnimationState, update_animation_atlas, update_sprite_animation},
+    utils::animation::{
+        AnimationState, SpriteAnimation, update_animation_atlas, update_sprite_animation,
+    },
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -26,9 +28,38 @@ pub(super) fn plugin(app: &mut App) {
     );
 }
 
+#[derive(Bundle, Default)]
+pub struct CharacterSpriteBundle {
+    sprite: Sprite,
+    anchor: Anchor,
+    sprite_animation: SpriteAnimation,
+    player_animation_state: PlayerAnimationState,
+}
+
+impl CharacterSpriteBundle {
+    pub fn from_player_assets(player_assets: Res<PlayerAssets>) -> Self {
+        CharacterSpriteBundle {
+            sprite: Sprite {
+                image: player_assets.sprite.clone(),
+                texture_atlas: Some(TextureAtlas::from(player_assets.atlas.clone())),
+                ..default()
+            },
+            anchor: Anchor::from(Vec2::new(0.0, -0.2)),
+            ..default()
+        }
+    }
+
+    pub fn with_state(mut self, state: PlayerAnimationState) -> Self {
+        self.sprite_animation = SpriteAnimation::from_state(state);
+        self.player_animation_state = state;
+        self
+    }
+}
+
 /// The different state of the animation for the player
-#[derive(Clone, Component, Reflect, PartialEq)]
+#[derive(Clone, Copy, Component, Default, Reflect, PartialEq)]
 pub enum PlayerAnimationState {
+    #[default]
     Idle,
     Walk,
     Jump,

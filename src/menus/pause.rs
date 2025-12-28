@@ -21,7 +21,7 @@ fn spawn_pause_menu(mut commands: Commands, mut scene_builder: SceneBuilder) {
         ("ui/cobweb/pause.cob", "scene"),
         &mut scene_builder,
         |handle| {
-            handle.insert((StateScoped(Menu::Pause), GlobalZIndex(2)));
+            handle.insert((DespawnOnExit(Menu::Pause), GlobalZIndex(2)));
         },
     );
 }

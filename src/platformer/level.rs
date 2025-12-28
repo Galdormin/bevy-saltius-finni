@@ -1,6 +1,6 @@
 //! Spawn the demo level for the platformer
 
-use bevy::{prelude::*, sprite::Anchor};
+use bevy::prelude::*;
 
 use avian2d::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
@@ -12,12 +12,11 @@ use crate::{
     camera::{LEVEL_HEIGHT, LEVEL_WIDTH, MainCamera},
     event::DeathEvent,
     player::{
-        animation::PlayerAnimationState,
+        animation::{CharacterSpriteBundle, PlayerAnimationState},
         movement::MovementBundle,
         physics::{CharacterController, CharacterControllerBundle, Grounded},
     },
     screens::Screen,
-    utils::animation::SpriteAnimation,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -62,7 +61,7 @@ pub fn spawn_level(
         Name::new("Level"),
         Transform::default(),
         Visibility::default(),
-        StateScoped(Screen::Gameplay),
+        DespawnOnExit(Screen::Gameplay),
         children![
             (
                 Name::new("Gameplay Music"),
@@ -74,14 +73,8 @@ pub fn spawn_level(
                 ..Default::default()
             },
             (
-                Sprite {
-                    image: player_assets.sprite.clone(),
-                    texture_atlas: Some(TextureAtlas::from(player_assets.atlas.clone())),
-                    anchor: Anchor::Custom(Vec2::new(0.0, -0.2)),
-                    ..default()
-                },
-                SpriteAnimation::from_state(PlayerAnimationState::Idle),
-                PlayerAnimationState::Idle,
+                CharacterSpriteBundle::from_player_assets(player_assets)
+                    .with_state(PlayerAnimationState::Idle),
                 Transform::from_xyz(LEVEL_WIDTH / 2.0, -LEVEL_HEIGHT / 2.0, 0.0),
                 CharacterControllerBundle::new(Collider::capsule(4.0, 2.0))
                     .with_gravity(250.0, 350.0, 450.0),
@@ -125,7 +118,7 @@ fn update_level_selection(
 }
 
 fn restart_level(
-    mut death_event: EventWriter<DeathEvent>,
+    mut death_event: MessageWriter<DeathEvent>,
     input: Res<ButtonInput<KeyCode>>,
     player_grounded: Single<Has<Grounded>, With<CharacterController>>,
 ) {
