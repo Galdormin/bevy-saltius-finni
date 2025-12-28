@@ -74,7 +74,7 @@ fn spawn_death_menu(mut commands: Commands, mut scene_builder: SceneBuilder) {
         ("ui/cobweb/death.cob", "scene"),
         &mut scene_builder,
         |handle| {
-            handle.insert((StateScoped(Menu::Death), GlobalZIndex(2)));
+            handle.insert((DespawnOnExit(Menu::Death), GlobalZIndex(2)));
         },
     );
 }
@@ -151,9 +151,9 @@ fn update_gene_container(
 
 fn toggle_gene(
     gene: Gene,
-) -> impl Fn(Trigger<Pointer<Click>>, ResMut<PlayerGenes>, Query<&mut GeneType, With<GeneButton>>) {
+) -> impl Fn(On<Pointer<Click>>, ResMut<PlayerGenes>, Query<&mut GeneType, With<GeneButton>>) {
     move |trigger, mut player_genes, mut gene_buttons| {
-        let Ok(mut gene_type) = gene_buttons.get_mut(trigger.event().target) else {
+        let Ok(mut gene_type) = gene_buttons.get_mut(trigger.event().entity) else {
             return;
         };
 
@@ -173,6 +173,6 @@ fn toggle_gene(
     }
 }
 
-fn send_respawn_event_on_click(_: Trigger<Pointer<Click>>, mut ev: EventWriter<RespawnEvent>) {
-    ev.write(RespawnEvent);
+fn send_respawn_event_on_click(_: On<Pointer<Click>>, mut msg: MessageWriter<RespawnEvent>) {
+    msg.write(RespawnEvent);
 }

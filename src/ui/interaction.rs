@@ -68,7 +68,7 @@ fn apply_interaction_atlas(
 }
 
 fn play_on_hover_sound_effect(
-    trigger: Trigger<Pointer<Over>>,
+    trigger: On<Pointer<Over>>,
     mut commands: Commands,
     ui_assets: Option<Res<UiAssets>>,
     interaction_query: Query<(), With<Interaction>>,
@@ -77,13 +77,13 @@ fn play_on_hover_sound_effect(
         return;
     };
 
-    if interaction_query.contains(trigger.target()) {
+    if interaction_query.contains(trigger.entity) {
         commands.spawn(sound_effect(ui_assets.hover_sound.clone()));
     }
 }
 
 fn play_on_click_sound_effect(
-    trigger: Trigger<Pointer<Click>>,
+    trigger: On<Pointer<Click>>,
     mut commands: Commands,
     ui_assets: Option<Res<UiAssets>>,
     interaction_query: Query<(), With<Interaction>>,
@@ -92,7 +92,7 @@ fn play_on_click_sound_effect(
         return;
     };
 
-    if interaction_query.contains(trigger.target()) {
+    if interaction_query.contains(trigger.entity) {
         commands.spawn(sound_effect(ui_assets.click_sound.clone()));
     }
 }

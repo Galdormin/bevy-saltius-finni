@@ -105,3 +105,64 @@ impl StaticAttribute for TextLineText {
         TextLineText(value)
     }
 }
+
+pub trait CobButtonRegistration<E: bevy::prelude::EntityEvent, B: Bundle, M> {
+    fn register_button<T: Component + Loadable>(
+        &mut self,
+        observer: impl IntoObserverSystem<E, B, M> + Clone + Sync + 'static,
+    ) -> &mut Self;
+}
+
+impl<E: bevy::prelude::EntityEvent, B: Bundle, M> CobButtonRegistration<E, B, M> for App {
+    fn register_button<T: Component + Loadable>(
+        &mut self,
+        observer: impl IntoObserverSystem<E, B, M> + Clone + Sync + 'static,
+    ) -> &mut Self {
+        self.register_component_type::<T>().add_systems(
+            Update,
+            move |mut commands: Commands, buttons: Query<Entity, Added<T>>| {
+                for entity in buttons.iter() {
+                    commands.entity(entity).observe(observer.clone());
+                }
+            },
+        )
+    }
+}
+
+/* Custom Cobweb component */
+
+/// Cobweb component to change [`Screen`] on click
+#[derive(Component, Debug, Default, Reflect, PartialEq)]
+struct ChangeScreenButton(Screen);
+
+/// Cobweb component to change [`Menu`] on click
+#[derive(Component, Debug, Default, Reflect, PartialEq)]
+struct ChangeMenuButton(Menu);
+
+/// Cobweb component to quit on click
+#[derive(Component, Debug, Default, Reflect, PartialEq)]
+struct QuitButton;
+
+fn quit_app(_: On<Pointer<Click>>, mut app_exit: MessageWriter<AppExit>) {
+    app_exit.write(AppExit::Success);
+}
+
+fn change_screen(
+    trigger: On<Pointer<Click>>,
+    mut next_screen: ResMut<NextState<Screen>>,
+    buttons: Query<&ChangeScreenButton>,
+) {
+    if let Ok(button) = buttons.get(trigger.entity) {
+        next_screen.set(button.0);
+    }
+}
+
+fn change_menu(
+    trigger: On<Pointer<Click>>,
+    mut next_menu: ResMut<NextState<Menu>>,
+    buttons: Query<&ChangeMenuButton>,
+) {
+    if let Ok(button) = buttons.get(trigger.entity) {
+        next_menu.set(button.0);
+    }
+}
