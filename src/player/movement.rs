@@ -141,10 +141,10 @@ fn movement(
 
     let mut direction = 0;
     for input in Action::DIRECTIONS {
-        if action_state.pressed(&input) {
-            if let Some(dir) = input.direction() {
-                direction += dir;
-            }
+        if action_state.pressed(&input)
+            && let Some(dir) = input.direction()
+        {
+            direction += dir;
         }
     }
 
