@@ -8,7 +8,7 @@ use bevy::prelude::*;
 use crate::{
     assets::collections::PlayerAssets,
     player::{
-        movement::Dead,
+        death::Dead,
         physics::{CharacterController, Grounded},
     },
     utils::animation::{AnimationState, update_animation_atlas, update_sprite_animation},

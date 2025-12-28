@@ -3,7 +3,7 @@
 // Unused utilities may trigger this lints undesirably.
 #![allow(dead_code)]
 
-mod cobweb;
+pub mod cobweb;
 pub mod interaction;
 pub mod palette;
 pub mod theme;
