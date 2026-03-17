@@ -1,6 +1,7 @@
 //! Define Cobweb missing attributes
 
 use bevy::{
+    ecs::system::IntoObserverSystem,
     prelude::*,
     text::{ComputedTextBlock, TextLayoutInfo},
     ui::{ContentSize, widget::TextNodeFlags},
@@ -8,6 +9,8 @@ use bevy::{
 
 use bevy_cobweb::prelude::*;
 use bevy_cobweb_ui::prelude::*;
+
+use crate::states::{Menu, Screen};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_static::<TextLineFont>()

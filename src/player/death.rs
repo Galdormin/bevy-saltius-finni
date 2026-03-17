@@ -2,10 +2,7 @@
 
 use bevy::prelude::*;
 
-use avian2d::{
-    math::Vector,
-    prelude::{Collider, CollisionLayers, RigidBody, SleepingDisabled},
-};
+use avian2d::math::Vector;
 
 use sf_ui::prelude::Screen;
 
