@@ -101,7 +101,7 @@ buttons as _
 
     ""
         +button{
-            ChangeMenuButton(None)
+            StateButton<Menu>(None)
             RespawnButton
             "text"
                 TextLineText("Respawn")

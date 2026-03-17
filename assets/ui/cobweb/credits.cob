@@ -129,7 +129,7 @@ buttons as _
 
     ""
         +button{
-            ChangeMenuButton(Main)
+            StateButton<Menu>(Main)
             "text"
                 TextLineText("Back")
         }

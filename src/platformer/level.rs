@@ -5,6 +5,8 @@ use bevy::{prelude::*, sprite::Anchor};
 use avian2d::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
+use sf_ui::prelude::Screen;
+
 use crate::{
     GameLayer,
     assets::collections::{LevelAssets, PlayerAssets},
@@ -16,7 +18,6 @@ use crate::{
         movement::MovementBundle,
         physics::{CharacterController, CharacterControllerBundle, Grounded},
     },
-    screens::Screen,
     utils::animation::SpriteAnimation,
 };
 
@@ -82,7 +83,7 @@ pub fn spawn_level(
                 },
                 SpriteAnimation::from_state(PlayerAnimationState::Idle),
                 PlayerAnimationState::Idle,
-                Transform::from_xyz(LEVEL_WIDTH / 2.0, -LEVEL_HEIGHT / 2.0, 0.0),
+                Transform::from_xyz(LEVEL_WIDTH / 2.0, -LEVEL_HEIGHT / 2.0, 3.0),
                 CharacterControllerBundle::new(Collider::capsule(4.0, 2.0))
                     .with_gravity(250.0, 350.0, 450.0),
                 MovementBundle::default(),
@@ -118,7 +119,6 @@ fn update_level_selection(
             && level_bounds.contains(player.translation.truncate())
         {
             *level_selection = LevelSelection::iid(level.iid.clone());
-
             camera.translation = level_bounds.center().extend(camera.translation.z);
         }
     }

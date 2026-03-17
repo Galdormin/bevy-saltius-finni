@@ -3,8 +3,9 @@
 use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 
 use bevy_cobweb_ui::prelude::*;
+use sf_ui::prelude::Menu;
 
-use crate::{assets::collections::LevelAssets, audio::music, menus::Menu};
+use crate::{assets::collections::LevelAssets, audio::music};
 
 pub(super) fn plugin(app: &mut App) {
     app.load("ui/cobweb/credits.cob");

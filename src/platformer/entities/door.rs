@@ -3,10 +3,11 @@ use bevy::prelude::*;
 use avian2d::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
+use sf_ui::prelude::Screen;
+
 use crate::{
     GameLayer,
     platformer::entities::button::{ActivatedBy, ActivationStatus, UnresolvedActivateByRef},
-    screens::Screen,
 };
 
 pub(super) fn plugin(app: &mut App) {

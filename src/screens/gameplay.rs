@@ -3,9 +3,9 @@
 use avian2d::prelude::{Physics, PhysicsTime};
 use bevy::{input::common_conditions::input_just_pressed, prelude::*, ui::Val::*};
 
-use crate::{
-    Pause, event::DeathEvent, menus::Menu, platformer::level::spawn_level, screens::Screen,
-};
+use sf_ui::prelude::{Menu, Screen};
+
+use crate::{Pause, event::DeathEvent, platformer::level::spawn_level};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Screen::Gameplay), spawn_level);

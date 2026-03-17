@@ -1,10 +1,13 @@
 //! Handle death of player
 
+use bevy::prelude::*;
+
 use avian2d::{
     math::Vector,
     prelude::{Collider, CollisionLayers, RigidBody, SleepingDisabled},
 };
-use bevy::prelude::*;
+
+use sf_ui::prelude::Screen;
 
 use crate::{
     GameLayer,
@@ -13,7 +16,6 @@ use crate::{
         movement::JumpAmount,
         physics::{CharacterController, Grounded},
     },
-    screens::Screen,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -112,7 +114,7 @@ fn respawn_player(
 
     let (entity, mut transform, mut jump_amount) = player.into_inner();
 
-    transform.translation = respawn_position.0.extend(0.0);
+    transform.translation = respawn_position.0.extend(transform.translation.z);
 
     jump_amount.reset();
     commands.entity(entity).remove::<Dead>();
