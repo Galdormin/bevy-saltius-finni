@@ -162,11 +162,9 @@ fn toggle_gene(
                 player_genes.remove_active_gene(gene.id);
                 *gene_type = GeneType::Inactive;
             }
-            GeneType::Inactive => {
-                if player_genes.remaining_gene_slot() > 0 {
-                    player_genes.add_active_gene(gene.id);
-                    *gene_type = GeneType::Active;
-                }
+            GeneType::Inactive if player_genes.remaining_gene_slot() > 0 => {
+                player_genes.add_active_gene(gene.id);
+                *gene_type = GeneType::Active;
             }
             _ => (),
         }
