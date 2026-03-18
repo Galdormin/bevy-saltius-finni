@@ -3,19 +3,19 @@
 use bevy::prelude::*;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_event::<JumpEvent>()
-        .add_event::<DeathEvent>()
-        .add_event::<RespawnEvent>();
+    app.add_message::<JumpEvent>()
+        .add_message::<DeathEvent>()
+        .add_message::<RespawnEvent>();
 }
 
-/// Event sent when the player jumps.
-#[derive(Event, Debug)]
+/// Message sent when the player jumps.
+#[derive(Message, Debug)]
 pub struct JumpEvent;
 
-/// Event sent when the player dies
-#[derive(Event, Debug)]
+/// Message sent when the player dies
+#[derive(Message, Debug)]
 pub struct DeathEvent;
 
-/// Event sent to respawn the player
-#[derive(Event, Debug)]
+/// Message sent to respawn the player
+#[derive(Message, Debug)]
 pub struct RespawnEvent;

@@ -49,7 +49,7 @@ pub trait CobButtonRegistration<E: Event, B: Bundle, M> {
     ) -> &mut Self;
 }
 
-impl<E: Event, B: Bundle, M> CobButtonRegistration<E, B, M> for App {
+impl<E: EntityEvent, B: Bundle, M> CobButtonRegistration<E, B, M> for App {
     fn register_button<T: Component + Loadable>(
         &mut self,
         observer: impl IntoObserverSystem<E, B, M> + Clone + Sync + 'static,
@@ -137,16 +137,16 @@ struct StateButton<S: ButtonStates>(S);
 #[derive(Component, Debug, Default, Reflect, PartialEq)]
 struct QuitButton;
 
-fn quit_app(_: Trigger<Pointer<Click>>, mut app_exit: EventWriter<AppExit>) {
+fn quit_app(_: On<Pointer<Click>>, mut app_exit: MessageWriter<AppExit>) {
     app_exit.write(AppExit::Success);
 }
 
 fn change_state<S: ButtonStates>(
-    trigger: Trigger<Pointer<Click>>,
+    trigger: On<Pointer<Click>>,
     mut next_state: ResMut<NextState<S>>,
     buttons: Query<&StateButton<S>>,
 ) {
-    if let Ok(button) = buttons.get(trigger.target) {
+    if let Ok(button) = buttons.get(trigger.event().event_target()) {
         next_state.set(button.0);
     }
 }

@@ -11,7 +11,6 @@ use crate::player::physics::{CharacterController, Grounded};
 use crate::{Action, AppSystems, PausableSystems};
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_event::<JumpEvent>();
     app.add_systems(
         Update,
         (update_coyote_timer, movement, jump)
@@ -44,7 +43,7 @@ impl Default for CoyoteTimer {
 
 impl CoyoteTimer {
     fn can_jump(&self) -> bool {
-        !self.0.finished()
+        !self.0.is_finished()
     }
 
     fn reset_timer(&mut self) {
@@ -115,7 +114,7 @@ impl Default for MovementBundle {
 
 /// Responds to [`Action`] events and moves character controllers accordingly.
 fn movement(
-    mut jump_event_writer: EventWriter<JumpEvent>,
+    mut jump_event_writer: MessageWriter<JumpEvent>,
     action_state: Single<&ActionState<Action>, With<CharacterController>>,
     controller: Single<
         (
@@ -142,10 +141,10 @@ fn movement(
 
     let mut direction = 0;
     for input in Action::DIRECTIONS {
-        if action_state.pressed(&input) {
-            if let Some(dir) = input.direction() {
-                direction += dir;
-            }
+        if action_state.pressed(&input)
+            && let Some(dir) = input.direction()
+        {
+            direction += dir;
         }
     }
 
@@ -165,7 +164,7 @@ fn update_coyote_timer(time: Res<Time>, players: Query<(&mut CoyoteTimer, Has<Gr
 
 /// Handle Jump Behavior
 fn jump(
-    mut jump_event_reader: EventReader<JumpEvent>,
+    mut jump_event_reader: MessageReader<JumpEvent>,
     player: Single<(&mut JumpAmount, &JumpImpulse, &mut LinearVelocity), With<CharacterController>>,
 ) {
     let (mut jump_amount, jump_impulse, mut linear_velocity) = player.into_inner();

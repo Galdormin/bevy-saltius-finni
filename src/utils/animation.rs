@@ -52,7 +52,7 @@ impl SpriteAnimation {
         if let Some(timer) = self.timer.as_mut() {
             timer.tick(delta);
 
-            if timer.finished() {
+            if timer.is_finished() {
                 self.frame = (self.frame + 1) % self.max_frame;
             }
         }

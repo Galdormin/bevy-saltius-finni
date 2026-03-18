@@ -16,7 +16,7 @@ fn spawn_main_menu(mut commands: Commands, mut scene_builder: SceneBuilder) {
         ("ui/cobweb/main.cob", "scene"),
         &mut scene_builder,
         |handle| {
-            handle.insert(StateScoped(Menu::Main));
+            handle.insert(DespawnOnExit(Menu::Main));
         },
     );
 }
