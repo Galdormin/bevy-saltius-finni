@@ -48,15 +48,10 @@ impl UiAssets {
             image: self.button_image.clone(),
             texture_atlas: Some(TextureAtlas::from(self.button_atlas.clone())),
             image_mode: NodeImageMode::Sliced(TextureSlicer {
-                border: BorderRect {
-                    left: 5.0,
-                    right: 5.0,
-                    top: 5.0,
-                    bottom: 6.0,
-                },
-                ..Default::default()
+                border: [5.0, 5.0, 5.0, 6.0].into(),
+                ..default()
             }),
-            ..Default::default()
+            ..default()
         }
     }
 }
