@@ -8,14 +8,14 @@ pub(super) fn plugin(app: &mut App) {
         .add_message::<RespawnEvent>();
 }
 
-/// Message sent when the player jumps.
+/// Event sent when the player jumps.
 #[derive(Message, Debug)]
 pub struct JumpEvent;
 
-/// Message sent when the player dies
+/// Event sent when the player dies
 #[derive(Message, Debug)]
 pub struct DeathEvent;
 
-/// Message sent to respawn the player
+/// Event sent to respawn the player
 #[derive(Message, Debug)]
 pub struct RespawnEvent;

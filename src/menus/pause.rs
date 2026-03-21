@@ -2,13 +2,11 @@
 
 use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 
-use bevy_cobweb_ui::prelude::*;
+use sf_ui::prelude::{Menu, Screen};
 
-use sf_ui::prelude::Menu;
+use crate::ui::prelude::*;
 
 pub(super) fn plugin(app: &mut App) {
-    app.load("ui/cobweb/pause.cob");
-
     app.add_systems(OnEnter(Menu::Pause), spawn_pause_menu);
     app.add_systems(
         Update,
@@ -16,14 +14,35 @@ pub(super) fn plugin(app: &mut App) {
     );
 }
 
-fn spawn_pause_menu(mut commands: Commands, mut scene_builder: SceneBuilder) {
-    commands.ui_root().spawn_scene(
-        ("ui/cobweb/pause.cob", "scene"),
-        &mut scene_builder,
-        |handle| {
-            handle.insert((DespawnOnExit(Menu::Pause), GlobalZIndex(2)));
-        },
-    );
+fn spawn_pause_menu(mut commands: Commands) {
+    commands.spawn((
+        widget::ui_root("Pause Menu"),
+        GlobalZIndex(2),
+        DespawnOnExit(Menu::Pause),
+        children![
+            widget::header("Game Paused"),
+            widget::button("Continue", continue_game),
+            widget::button("Settings", go_to_settings),
+            widget::button("Quit to title", quit_to_title),
+        ],
+    ));
+}
+
+fn continue_game(_: On<Pointer<Click>>, mut next_menu: ResMut<NextState<Menu>>) {
+    next_menu.set(Menu::None);
+}
+
+fn go_to_settings(_: On<Pointer<Click>>, mut next_menu: ResMut<NextState<Menu>>) {
+    next_menu.set(Menu::Settings);
+}
+
+fn quit_to_title(
+    _: On<Pointer<Click>>,
+    mut next_screen: ResMut<NextState<Screen>>,
+    mut next_menu: ResMut<NextState<Menu>>,
+) {
+    next_menu.set(Menu::None);
+    next_screen.set(Screen::Title);
 }
 
 fn go_back(mut next_menu: ResMut<NextState<Menu>>) {

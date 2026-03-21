@@ -23,6 +23,12 @@ pub struct UiAssets {
     #[asset(texture_atlas_layout(tile_size_x = 40, tile_size_y = 27, columns = 2, rows = 1))]
     pub button_atlas: Handle<TextureAtlasLayout>,
 
+    // Images
+    #[asset(path = "icons/banner.png")]
+    pub banner: Handle<Image>,
+    #[asset(path = "ui/jump_icon.png")]
+    pub jump_icon: Handle<Image>,
+
     // Fonts
     #[asset(path = "fonts/monogram.ttf")]
     pub monogram: Handle<Font>,

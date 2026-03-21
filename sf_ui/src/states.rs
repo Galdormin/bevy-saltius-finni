@@ -1,17 +1,12 @@
-//! Define the UI state of the app
+//! Define the UI states of the app
 
 use bevy::prelude::*;
 
-use crate::prelude::*;
-
 pub(super) fn plugin(app: &mut App) {
     app.init_state::<Screen>().init_state::<Menu>();
-
-    app.register_button_state::<Screen>()
-        .register_button_state::<Menu>();
 }
 
-/// The different state of the game
+/// The different screens of the game
 #[derive(Reflect, States, Copy, Clone, Eq, PartialEq, Hash, Debug, Default)]
 #[states(scoped_entities)]
 pub enum Screen {
@@ -22,7 +17,7 @@ pub enum Screen {
     Gameplay,
 }
 
-/// The different menu of the app
+/// The different menus of the app
 #[derive(States, Copy, Clone, Eq, PartialEq, Reflect, Hash, Debug, Default)]
 #[states(scoped_entities)]
 pub enum Menu {

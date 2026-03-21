@@ -60,12 +60,13 @@ fn spawn_pause_overlay(mut commands: Commands) {
 
 fn open_death_menu(
     mut commands: Commands,
-    death_event: MessageReader<DeathEvent>,
+    mut death_event: MessageReader<DeathEvent>,
     mut next_menu: ResMut<NextState<Menu>>,
 ) {
     if death_event.is_empty() {
         return;
     }
+    death_event.clear();
 
     commands.spawn((
         Name::new("Death Overlay"),

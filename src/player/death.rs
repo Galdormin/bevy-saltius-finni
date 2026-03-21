@@ -53,10 +53,11 @@ fn update_dead(
 
 fn add_dead_on_death(
     mut commands: Commands,
-    death_event: MessageReader<DeathEvent>,
+    mut death_event: MessageReader<DeathEvent>,
     player: Single<Entity, With<CharacterController>>,
 ) {
     if !death_event.is_empty() {
+        death_event.clear();
         commands.entity(*player).insert(Dead);
     }
 }
@@ -84,13 +85,14 @@ fn spawn_body_on_death(
 
 fn respawn_player(
     mut commands: Commands,
-    respawn_event: MessageReader<RespawnEvent>,
+    mut respawn_event: MessageReader<RespawnEvent>,
     respawn_position: Res<RespawnPosition>,
     player: Single<(Entity, &mut Transform, &mut JumpAmount), With<CharacterController>>,
 ) {
     if respawn_event.is_empty() {
         return;
     }
+    respawn_event.clear();
 
     let (entity, mut transform, mut jump_amount) = player.into_inner();
 
