@@ -23,6 +23,12 @@ pub struct UiAssets {
     #[asset(texture_atlas_layout(tile_size_x = 40, tile_size_y = 27, columns = 2, rows = 1))]
     pub button_atlas: Handle<TextureAtlasLayout>,
 
+    // Images
+    #[asset(path = "icons/banner.png")]
+    pub banner: Handle<Image>,
+    #[asset(path = "ui/jump_icon.png")]
+    pub jump_icon: Handle<Image>,
+
     // Fonts
     #[asset(path = "fonts/monogram.ttf")]
     pub monogram: Handle<Font>,
@@ -42,15 +48,10 @@ impl UiAssets {
             image: self.button_image.clone(),
             texture_atlas: Some(TextureAtlas::from(self.button_atlas.clone())),
             image_mode: NodeImageMode::Sliced(TextureSlicer {
-                border: BorderRect {
-                    left: 5.0,
-                    right: 5.0,
-                    top: 5.0,
-                    bottom: 6.0,
-                },
-                ..Default::default()
+                border: [5.0, 5.0, 5.0, 6.0].into(),
+                ..default()
             }),
-            ..Default::default()
+            ..default()
         }
     }
 }

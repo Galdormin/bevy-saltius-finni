@@ -21,7 +21,7 @@ pub fn ui_root(name: impl Into<Cow<'static, str>>) -> impl Bundle {
             align_items: AlignItems::Center,
             justify_content: JustifyContent::Center,
             flex_direction: FlexDirection::Column,
-            row_gap: Px(20.0),
+            row_gap: Px(2.0),
             ..default()
         },
         // Don't block picking events for other UI roots.
@@ -61,16 +61,14 @@ where
     button_base(
         text,
         action,
-        (
-            Node {
-                width: Px(70.0),
-                height: Px(13.0),
-                align_items: AlignItems::Center,
-                justify_content: JustifyContent::Center,
-                ..default()
-            },
-            BorderRadius::MAX,
-        ),
+        (Node {
+            width: Px(70.0),
+            height: Px(13.0),
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            border_radius: BorderRadius::MAX,
+            ..default()
+        },),
     )
 }
 

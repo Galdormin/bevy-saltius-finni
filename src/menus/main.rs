@@ -2,21 +2,52 @@
 
 use bevy::prelude::*;
 
-use bevy_cobweb_ui::prelude::*;
+use sf_ui::prelude::{Menu, Screen};
 
-use sf_ui::prelude::Menu;
+use crate::assets::collections::UiAssets;
+use crate::ui::prelude::*;
 
 pub(super) fn plugin(app: &mut App) {
-    app.load("ui/cobweb/main.cob")
-        .add_systems(OnEnter(Menu::Main), spawn_main_menu);
+    app.add_systems(OnEnter(Menu::Main), spawn_main_menu);
 }
 
-fn spawn_main_menu(mut commands: Commands, mut scene_builder: SceneBuilder) {
-    commands.ui_root().spawn_scene(
-        ("ui/cobweb/main.cob", "scene"),
-        &mut scene_builder,
-        |handle| {
-            handle.insert(DespawnOnExit(Menu::Main));
-        },
-    );
+fn spawn_main_menu(mut commands: Commands, ui_assets: Res<UiAssets>) {
+    commands.spawn((
+        widget::ui_root("Main Menu"),
+        DespawnOnExit(Menu::Main),
+        children![
+            (
+                Name::new("Banner"),
+                ImageNode {
+                    image: ui_assets.banner.clone(),
+                    ..default()
+                },
+            ),
+            widget::button("Play", go_to_gameplay),
+            widget::button("Settings", go_to_settings),
+            widget::button("Credits", go_to_credits),
+            widget::button("Quit", quit_app),
+        ],
+    ));
+}
+
+fn go_to_gameplay(
+    _: On<Pointer<Click>>,
+    mut next_screen: ResMut<NextState<Screen>>,
+    mut next_menu: ResMut<NextState<Menu>>,
+) {
+    next_menu.set(Menu::None);
+    next_screen.set(Screen::Gameplay);
+}
+
+fn go_to_settings(_: On<Pointer<Click>>, mut next_menu: ResMut<NextState<Menu>>) {
+    next_menu.set(Menu::Settings);
+}
+
+fn go_to_credits(_: On<Pointer<Click>>, mut next_menu: ResMut<NextState<Menu>>) {
+    next_menu.set(Menu::Credits);
+}
+
+fn quit_app(_: On<Pointer<Click>>, mut app_exit: MessageWriter<AppExit>) {
+    app_exit.write(AppExit::Success);
 }
