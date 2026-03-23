@@ -5,9 +5,9 @@ use bevy::ui::Val::*;
 
 use sf_ui::prelude::Screen;
 
-use crate::assets::collections::UiAssets;
+use sf_ui::prelude::{UiAssets, UiTheme};
+
 use crate::player::{movement::JumpAmount, physics::CharacterController};
-use crate::ui::theme::UiTheme;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<JumpCounter>();

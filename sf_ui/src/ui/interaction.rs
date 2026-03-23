@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{assets::collections::UiAssets, audio::sound_effect};
+use crate::assets::UiAssets;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<InteractionPalette>();
@@ -78,7 +78,10 @@ fn play_on_hover_sound_effect(
     };
 
     if interaction_query.contains(trigger.entity) {
-        commands.spawn(sound_effect(ui_assets.hover_sound.clone()));
+        commands.spawn((
+            AudioPlayer(ui_assets.hover_sound.clone()),
+            PlaybackSettings::DESPAWN,
+        ));
     }
 }
 
@@ -93,6 +96,9 @@ fn play_on_click_sound_effect(
     };
 
     if interaction_query.contains(trigger.entity) {
-        commands.spawn(sound_effect(ui_assets.click_sound.clone()));
+        commands.spawn((
+            AudioPlayer(ui_assets.click_sound.clone()),
+            PlaybackSettings::DESPAWN,
+        ));
     }
 }

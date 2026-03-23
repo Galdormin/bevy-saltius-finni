@@ -1,8 +1,6 @@
 use bevy::prelude::*;
-
 use bevy_asset_loader::prelude::*;
-
-use sf_ui::prelude::Screen;
+use sf_ui::states::Screen;
 
 pub mod collections;
 

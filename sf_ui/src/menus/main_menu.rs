@@ -2,10 +2,11 @@
 
 use bevy::prelude::*;
 
-use sf_ui::prelude::{Menu, Screen};
-
-use crate::assets::collections::UiAssets;
-use crate::ui::prelude::*;
+use crate::{
+    assets::UiAssets,
+    states::{Menu, Screen},
+    ui::widget,
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Menu::Main), spawn_main_menu);

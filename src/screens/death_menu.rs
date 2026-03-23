@@ -3,13 +3,11 @@
 use bevy::prelude::*;
 use bevy::ui::Val::*;
 
-use sf_ui::prelude::Menu;
+use sf_ui::prelude::{Menu, UiTheme, widget};
 
 use crate::event::RespawnEvent;
 use crate::player::genes::Gene;
 use crate::player::genes::PlayerGenes;
-use crate::ui::prelude::*;
-use crate::ui::theme::UiTheme;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<GeneContainer>();

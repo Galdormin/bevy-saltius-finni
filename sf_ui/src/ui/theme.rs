@@ -1,11 +1,11 @@
 use bevy::prelude::*;
 
 use crate::{
-    assets::collections::UiAssets,
+    assets::UiAssets,
     ui::{
         interaction::InteractionAtlas,
         palette::{BUTTON_BACKGROUND, BUTTON_HOVERED_BACKGROUND, BUTTON_PRESSED_BACKGROUND},
-        prelude::InteractionPalette,
+        interaction::InteractionPalette,
     },
 };
 

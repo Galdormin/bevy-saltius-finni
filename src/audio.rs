@@ -1,5 +1,9 @@
 use bevy::prelude::*;
 
+use sf_ui::prelude::Menu;
+
+use crate::assets::collections::LevelAssets;
+
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Music>();
     app.register_type::<SoundEffect>();
@@ -8,6 +12,16 @@ pub(super) fn plugin(app: &mut App) {
         Update,
         apply_global_volume.run_if(resource_changed::<GlobalVolume>),
     );
+
+    app.add_systems(OnEnter(Menu::Credits), start_credits_music);
+}
+
+fn start_credits_music(mut commands: Commands, level_assets: Res<LevelAssets>) {
+    commands.spawn((
+        Name::new("Credits Music"),
+        DespawnOnExit(Menu::Credits),
+        music(level_assets.music.clone()),
+    ));
 }
 
 /// An organizational marker component that should be added to a spawned [`AudioPlayer`] if it's in the

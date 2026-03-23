@@ -2,15 +2,10 @@
 
 use bevy::{input::common_conditions::input_just_pressed, prelude::*, ui::Val::*};
 
-use sf_ui::prelude::Menu;
-
-use crate::{assets::collections::LevelAssets, audio::music, ui::prelude::*};
+use crate::{states::Menu, ui::widget};
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_systems(
-        OnEnter(Menu::Credits),
-        (spawn_credits_menu, start_credits_music),
-    );
+    app.add_systems(OnEnter(Menu::Credits), spawn_credits_menu);
     app.add_systems(
         Update,
         go_back.run_if(in_state(Menu::Credits).and(input_just_pressed(KeyCode::Escape))),
@@ -98,12 +93,4 @@ fn go_back_on_click(_: On<Pointer<Click>>, mut next_menu: ResMut<NextState<Menu>
 
 fn go_back(mut next_menu: ResMut<NextState<Menu>>) {
     next_menu.set(Menu::Main);
-}
-
-fn start_credits_music(mut commands: Commands, level_assets: Res<LevelAssets>) {
-    commands.spawn((
-        Name::new("Credits Music"),
-        DespawnOnExit(Menu::Credits),
-        music(level_assets.music.clone()),
-    ));
 }

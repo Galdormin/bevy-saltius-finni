@@ -4,9 +4,10 @@
 
 use bevy::{audio::Volume, input::common_conditions::input_just_pressed, prelude::*, ui::Val::*};
 
-use sf_ui::prelude::{Menu, Screen};
-
-use crate::ui::prelude::*;
+use crate::{
+    states::{Menu, Screen},
+    ui::widget,
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Menu::Settings), spawn_settings_menu);
