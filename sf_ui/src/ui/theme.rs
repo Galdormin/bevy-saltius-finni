@@ -4,8 +4,8 @@ use crate::{
     assets::UiAssets,
     ui::{
         interaction::InteractionAtlas,
-        palette::{BUTTON_BACKGROUND, BUTTON_HOVERED_BACKGROUND, BUTTON_PRESSED_BACKGROUND},
         interaction::InteractionPalette,
+        palette::{BUTTON_BACKGROUND, BUTTON_HOVERED_BACKGROUND, BUTTON_PRESSED_BACKGROUND},
     },
 };
 
