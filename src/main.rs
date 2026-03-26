@@ -8,7 +8,6 @@ mod audio;
 mod camera;
 #[cfg(feature = "dev")]
 mod dev_tools;
-mod event;
 mod platformer;
 mod player;
 mod screens;
@@ -20,6 +19,8 @@ use avian2d::{PhysicsPlugins, prelude::PhysicsLayer};
 use bevy_ecs_ldtk::prelude::*;
 use leafwing_input_manager::prelude::*;
 
+use sf_events::SfEventsPlugin;
+use sf_gene::SfGenePlugin;
 use sf_ui::plugin::SfUiPlugin;
 
 fn main() -> AppExit {
@@ -55,6 +56,12 @@ impl Plugin for AppPlugin {
             LdtkPlugin,
         ));
 
+        // Add Game Core Plugins
+        app.add_plugins((SfEventsPlugin,));
+
+        // Add Game Plugins
+        app.add_plugins((SfGenePlugin,));
+
         // Add other plugins.
         app.add_plugins((
             assets::plugin,
@@ -63,7 +70,6 @@ impl Plugin for AppPlugin {
             camera::plugin,
             #[cfg(feature = "dev")]
             dev_tools::plugin,
-            event::plugin,
             player::plugin,
             platformer::plugin,
             screens::plugin,

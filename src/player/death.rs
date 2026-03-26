@@ -6,12 +6,11 @@ use avian2d::math::Vector;
 
 use sf_ui::prelude::Screen;
 
-use crate::{
-    event::{DeathEvent, RespawnEvent},
-    player::{
-        movement::JumpAmount,
-        physics::{CharacterController, Grounded},
-    },
+use sf_events::{DeathEvent, RespawnEvent};
+
+use crate::player::{
+    movement::JumpAmount,
+    physics::{CharacterController, Grounded},
 };
 
 pub(super) fn plugin(app: &mut App) {

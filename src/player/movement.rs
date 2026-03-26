@@ -5,7 +5,8 @@ use bevy::prelude::*;
 use avian2d::{math::*, prelude::*};
 use leafwing_input_manager::prelude::*;
 
-use crate::event::JumpEvent;
+use sf_events::JumpEvent;
+
 use crate::player::death::Dead;
 use crate::player::physics::{CharacterController, Grounded};
 use crate::{Action, AppSystems, PausableSystems};
