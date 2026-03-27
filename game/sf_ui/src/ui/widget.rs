@@ -92,7 +92,7 @@ where
     )
 }
 
-/// A small square button with text and an action defined as an [`Observer`].
+/// A small icon button with text and an action defined as an [`Observer`].
 pub fn button_icon<E, B, M, I>(text: impl Into<String>, action: I) -> impl Bundle
 where
     E: EntityEvent,

@@ -4,7 +4,9 @@ use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 
 use sf_ui::prelude::Screen;
 
-use crate::{AppSystems, ui::prelude::*};
+use sf_ui::prelude::widget;
+
+use crate::AppSystems;
 
 pub(super) fn plugin(app: &mut App) {
     // Spawn splash screen.

@@ -1,0 +1,15 @@
+[package]
+name = "sf_gene"
+version.workspace = true
+edition.workspace = true
+description.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+bevy = { workspace = true }
+serde = { workspace = true }
+bevy_common_assets = { workspace = true }
+
+[lints]
+workspace = true

@@ -1,5 +1,5 @@
 [package]
-name = "sf_ui"
+name = "sf_events"
 version.workspace = true
 edition.workspace = true
 description.workspace = true
@@ -8,3 +8,6 @@ authors.workspace = true
 
 [dependencies]
 bevy = { workspace = true }
+
+[lints]
+workspace = true

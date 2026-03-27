@@ -5,6 +5,7 @@ use bevy::prelude::*;
 use avian2d::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
+use sf_events::DeathEvent;
 use sf_ui::prelude::Screen;
 
 use crate::{
@@ -12,7 +13,6 @@ use crate::{
     assets::collections::{LevelAssets, PlayerAssets},
     audio::music,
     camera::{LEVEL_HEIGHT, LEVEL_WIDTH, MainCamera},
-    event::DeathEvent,
     player::{
         animation::{CharacterSpriteBundle, PlayerAnimationState},
         movement::MovementBundle,

@@ -1,17 +1,12 @@
 //! Reusable UI widgets & theming.
 
-// Unused utilities may trigger this lints undesirably.
+// Unused utilities may trigger this lint undesirably.
 #![allow(dead_code)]
 
 pub mod interaction;
 pub mod palette;
 pub mod theme;
 pub mod widget;
-
-#[allow(unused_imports)]
-pub mod prelude {
-    pub use super::{interaction::InteractionPalette, palette as ui_palette, widget};
-}
 
 use bevy::prelude::*;
 
