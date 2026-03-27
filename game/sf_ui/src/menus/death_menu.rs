@@ -332,10 +332,10 @@ fn on_gene_drag_start(
             return;
         }
 
-        if let Some(ref icon) = icon {
-            if let Ok(mut node) = icon_nodes.get_mut(icon.0) {
-                node.display = Display::Flex;
-            }
+        if let Some(ref icon) = icon
+            && let Ok(mut node) = icon_nodes.get_mut(icon.0)
+        {
+            node.display = Display::Flex;
         }
 
         commands.insert_resource(DragState {
@@ -361,10 +361,10 @@ fn on_gene_drag_end(
             return;
         }
 
-        if let Some(ref icon) = icon {
-            if let Ok(mut node) = icon_nodes.get_mut(icon.0) {
-                node.display = Display::None;
-            }
+        if let Some(ref icon) = icon
+            && let Ok(mut node) = icon_nodes.get_mut(icon.0)
+        {
+            node.display = Display::None;
         }
 
         commands.remove_resource::<DragState>();
@@ -394,10 +394,10 @@ fn on_slot_drag_start(
             return;
         };
 
-        if let Some(ref icon) = icon {
-            if let Ok(mut node) = icon_nodes.get_mut(icon.0) {
-                node.display = Display::Flex;
-            }
+        if let Some(ref icon) = icon
+            && let Ok(mut node) = icon_nodes.get_mut(icon.0)
+        {
+            node.display = Display::Flex;
         }
 
         commands.insert_resource(DragState {
@@ -429,10 +429,10 @@ fn on_slot_drag_end(
             player_genes.remove_active_gene(drag_state.gene_id);
         }
 
-        if let Some(ref icon) = icon {
-            if let Ok(mut node) = icon_nodes.get_mut(icon.0) {
-                node.display = Display::None;
-            }
+        if let Some(ref icon) = icon
+            && let Ok(mut node) = icon_nodes.get_mut(icon.0)
+        {
+            node.display = Display::None;
         }
 
         commands.remove_resource::<DragState>();
@@ -465,10 +465,10 @@ fn on_slot_drag_drop(
             }
             DragSource::Slot(source_entity) => {
                 // Slot → Slot swap: return evicted gene to source slot.
-                if let Some(evicted_id) = evicted {
-                    if let Ok(mut source) = slots.get_mut(source_entity) {
-                        source.0 = Some(evicted_id);
-                    }
+                if let Some(evicted_id) = evicted
+                    && let Ok(mut source) = slots.get_mut(source_entity)
+                {
+                    source.0 = Some(evicted_id);
                 }
                 // Both genes stay active — no `PlayerGenes` change.
             }
